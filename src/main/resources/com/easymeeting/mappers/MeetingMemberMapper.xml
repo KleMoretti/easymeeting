@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easymeeting.mappers.MeetingMemberMapper">
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.easymeeting.entity.po.MeetingMember">
+		<!---->
+		<result column="meeting_id" property="meetingId" />
+		<!---->
+		<result column="user_id" property="userId" />
+		<!---->
+		<result column="nick_name" property="nickName" />
+		<!---->
+		<result column="last_join_time" property="lastJoinTime" />
+		<!---->
+		<result column="status" property="status" />
+		<!---->
+		<result column="member_type" property="memberType" />
+		<!---->
+		<result column="meeting_status" property="meetingStatus" />
+	</resultMap>
+
+	<!--通用查询列-->
+	<sql id="base_column_list">
+		meeting_id,user_id,nick_name,last_join_time,status,member_type,meeting_status
+	</sql>
+
+	<!--基础查询条件-->
+	<sql id="base_query_condition">
+		<if test=" query.meetingId != null and query.meetingId != ''">
+			and meeting_id = #{query.meetingId}
+		</if>
+		<if test=" query.userId != null and query.userId != ''">
+			and user_id = #{query.userId}
+		</if>
+		<if test=" query.nickName != null and query.nickName != ''">
+			and nick_name = #{query.nickName}
+		</if>
+		<if test=" query.lastJoinTime != null">
+			and last_join_time = #{query.lastJoinTime}
+		</if>
+		<if test=" query.status != null">
+			and status = #{query.status}
+		</if>
+		<if test=" query.memberType != null">
+			and member_type = #{query.memberType}
+		</if>
+		<if test=" query.meetingStatus != null">
+			and meeting_status = #{query.meetingStatus}
+		</if>
+	</sql>
+
+	<!--扩展查询条件-->
+	<sql id="base_query_condition_extend">
+		<if test=" query.meetingIdFuzzy != null and query.meetingIdFuzzy!= '' ">
+			and meeting_id like concat('%',#{query.meetingIdFuzzy},'%')
+		</if>
+		<if test=" query.userIdFuzzy != null and query.userIdFuzzy!= '' ">
+			and user_id like concat('%',#{query.userIdFuzzy},'%')
+		</if>
+		<if test=" query.nickNameFuzzy != null and query.nickNameFuzzy!= '' ">
+			and nick_name like concat('%',#{query.nickNameFuzzy},'%')
+		</if>
+		<if test=" query.lastJoinTimeStart != null and query.lastJoinTimeStart!= '' ">
+			<![CDATA[ and last_join_time >= str_to_date(#{query.lastJoinTimeStart}, '%Y-%m-%d') ]]> 
+		</if>
+		<if test=" query.lastJoinTimeEnd != null and query.lastJoinTimeEnd!= '' ">
+			<![CDATA[ and last_join_time < date_sub(str_to_date(#{query.lastJoinTimeEnd}, '%Y-%m-%d'), interval -1 day )]]> 
+		</if>
+	</sql>
+
+	<!--通用查询条件-->
+	<sql id="query_condition">
+		<where>
+			<include refid="base_query_condition" />
+			<include refid="base_query_condition_extend" />
+		</where>
+	</sql>
+
+	<!--查询列表-->
+	<select id="selectList" resultMap="base_result_map">
+		SELECT <include refid = "base_column_list" /> FROM meeting_member <include refid="query_condition" />
+		<if test="query.orderBy != null"> order by ${query.orderBy} </if>
+		<if test="query.simplePage != null"> limit #{query.simplePage.start},#{query.simplePage.pageSize}</if>
+	</select>
+
+	<!--查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer">
+		SELECT count(1) FROM meeting_member <include refid="query_condition" />
+	</select>
+
+	<!--插入（匹配有值的字段）-->
+	<insert id="insert" parameterType="com.easymeeting.entity.po.MeetingMember">
+
+		INSERT INTO meeting_member
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.meetingId != null">
+				meeting_id,
+			</if>
+			<if test="bean.userId != null">
+				user_id,
+			</if>
+			<if test="bean.nickName != null">
+				nick_name,
+			</if>
+			<if test="bean.lastJoinTime != null">
+				last_join_time,
+			</if>
+			<if test="bean.status != null">
+				status,
+			</if>
+			<if test="bean.memberType != null">
+				member_type,
+			</if>
+			<if test="bean.meetingStatus != null">
+				meeting_status,
+			</if>
+		</trim>		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.meetingId != null">
+				#{bean.meetingId},
+			</if>
+			<if test="bean.userId != null">
+				#{bean.userId},
+			</if>
+			<if test="bean.nickName != null">
+				#{bean.nickName},
+			</if>
+			<if test="bean.lastJoinTime != null">
+				#{bean.lastJoinTime},
+			</if>
+			<if test="bean.status != null">
+				#{bean.status},
+			</if>
+			<if test="bean.memberType != null">
+				#{bean.memberType},
+			</if>
+			<if test="bean.meetingStatus != null">
+				#{bean.meetingStatus},
+			</if>
+		</trim>
+	</insert>
+	<!--插入或者更新（匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.easymeeting.entity.po.MeetingMember">
+		INSERT INTO meeting_member
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.meetingId != null">
+				meeting_id,
+			</if>
+			<if test="bean.userId != null">
+				user_id,
+			</if>
+			<if test="bean.nickName != null">
+				nick_name,
+			</if>
+			<if test="bean.lastJoinTime != null">
+				last_join_time,
+			</if>
+			<if test="bean.status != null">
+				status,
+			</if>
+			<if test="bean.memberType != null">
+				member_type,
+			</if>
+			<if test="bean.meetingStatus != null">
+				meeting_status,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.meetingId != null">
+				#{bean.meetingId},
+			</if>
+			<if test="bean.userId != null">
+				#{bean.userId},
+			</if>
+			<if test="bean.nickName != null">
+				#{bean.nickName},
+			</if>
+			<if test="bean.lastJoinTime != null">
+				#{bean.lastJoinTime},
+			</if>
+			<if test="bean.status != null">
+				#{bean.status},
+			</if>
+			<if test="bean.memberType != null">
+				#{bean.memberType},
+			</if>
+			<if test="bean.meetingStatus != null">
+				#{bean.meetingStatus},
+			</if>
+		</trim>
+		ON DUPLICATE KEY UPDATE
+		<trim prefix="" suffix="" suffixOverrides=",">
+
+			<if test="bean.meetingId != null">
+				 meeting_id = VALUES(meeting_id),
+			</if>
+			<if test="bean.userId != null">
+				 user_id = VALUES(user_id),
+			</if>
+			<if test="bean.nickName != null">
+				 nick_name = VALUES(nick_name),
+			</if>
+			<if test="bean.lastJoinTime != null">
+				 last_join_time = VALUES(last_join_time),
+			</if>
+			<if test="bean.status != null">
+				 status = VALUES(status),
+			</if>
+			<if test="bean.memberType != null">
+				 member_type = VALUES(member_type),
+			</if>
+			<if test="bean.meetingStatus != null">
+				 meeting_status = VALUES(meeting_status),
+			</if>
+		</trim>
+	</insert>
+	<!--添加（批量插入）-->
+	<insert id="insertBatch" parameterType="com.easymeeting.entity.po.MeetingMember" >
+		INSERT INTO meeting_member(meeting_id,user_id,nick_name,last_join_time,status,member_type,meeting_status) VALUES
+		<foreach collection="list" item="item"  separator="," >
+			(#{item.meetingId},#{item.userId},#{item.nickName},#{item.lastJoinTime},#{item.status},#{item.memberType},#{item.meetingStatus})
+		</foreach>
+	</insert>
+	<!--批量插入或更新（批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.easymeeting.entity.po.MeetingMember" >
+		INSERT INTO meeting_member(meeting_id,user_id,nick_name,last_join_time,status,member_type,meeting_status) VALUES
+		<foreach collection="list" item="item"  separator="," open="(" close=")">
+			#{item.meetingId},#{item.userId},#{item.nickName},#{item.lastJoinTime},#{item.status},#{item.memberType},#{item.meetingStatus}
+		</foreach>
+			ON DUPLICATE KEY UPDATE
+	meeting_id = VALUES(meeting_id),user_id = VALUES(user_id),nick_name = VALUES(nick_name),last_join_time = VALUES(last_join_time),status = VALUES(status),member_type = VALUES(member_type),meeting_status = VALUES(meeting_status)
+	</insert>
+	<!--根据主键更新（匹配有值的字段）-->
+
+	<!--根据MeetingIdAndUserId查询-->
+	<select id ="selectByMeetingIdAndUserId" resultMap="base_result_map" >
+		SELECT <include refid = "base_column_list" /> FROM meeting_member where meeting_id=#{meetingId} and user_id=#{userId}
+	</select>
+
+	<!--根据MeetingIdAndUserId更新-->
+	<update id="updateByMeetingIdAndUserId"  parameterType="com.easymeeting.entity.po.MeetingMember" >
+		UPDATE meeting_member
+		<set>
+			<if test="bean.meetingId != null">
+				meeting_id = #{bean.meetingId},
+			</if>
+			<if test="bean.userId != null">
+				user_id = #{bean.userId},
+			</if>
+			<if test="bean.nickName != null">
+				nick_name = #{bean.nickName},
+			</if>
+			<if test="bean.lastJoinTime != null">
+				last_join_time = #{bean.lastJoinTime},
+			</if>
+			<if test="bean.status != null">
+				status = #{bean.status},
+			</if>
+			<if test="bean.memberType != null">
+				member_type = #{bean.memberType},
+			</if>
+			<if test="bean.meetingStatus != null">
+				meeting_status = #{bean.meetingStatus},
+			</if>
+		</set>
+		where meeting_id=#{meetingId} and user_id=#{userId}	</update>
+	<!--根据MeetingIdAndUserId删除-->
+	<delete id="deleteByMeetingIdAndUserId" >
+		DELETE from meeting_member where meeting_id=#{meetingId} and user_id=#{userId}
+	</delete>
+</mapper>
