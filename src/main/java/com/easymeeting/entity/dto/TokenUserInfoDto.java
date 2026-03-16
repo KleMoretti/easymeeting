@@ -11,7 +11,7 @@ public class TokenUserInfoDto implements Serializable {
     private String userId;
     private String nickName;
     private Integer sex;
-    private String currentMeeting;
+    private String currentMeetingId;
     private String currentNickName;
 
     private String myMeetingNo;
@@ -49,12 +49,12 @@ public class TokenUserInfoDto implements Serializable {
         this.sex = sex;
     }
 
-    public String getCurrentMeeting() {
-        return currentMeeting;
+    public String getCurrentMeetingId() {
+        return currentMeetingId;
     }
 
-    public void setCurrentMeeting(String currentMeeting) {
-        this.currentMeeting = currentMeeting;
+    public void setCurrentMeetingId(String currentMeetingId) {
+        this.currentMeetingId = currentMeetingId;
     }
 
     public String getCurrentNickName() {

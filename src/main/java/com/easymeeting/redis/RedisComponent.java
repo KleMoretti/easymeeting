@@ -37,5 +37,8 @@ public class RedisComponent {
     public TokenUserInfoDto getTokenUserInfoDto(String token){
         return (TokenUserInfoDto) redisUtils.get(Constants.REDIS_KEY_WS_TOKEN+token);
     }
+    public TokenUserInfoDto getTokenUserInfoDtoByUserId(String userId){
+        return (TokenUserInfoDto) redisUtils.get(Constants.REDIS_KEY_WS_TOKEN_USERID+userId);
+    }
 
 }

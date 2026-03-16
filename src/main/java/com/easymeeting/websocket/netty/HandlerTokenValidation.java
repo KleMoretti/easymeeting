@@ -2,6 +2,7 @@ package com.easymeeting.websocket.netty;
 
 import com.easymeeting.entity.dto.TokenUserInfoDto;
 import com.easymeeting.redis.RedisComponent;
+import com.easymeeting.websocket.ChannelContextUtils;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -23,6 +24,8 @@ public class HandlerTokenValidation extends SimpleChannelInboundHandler<FullHttp
 
     @Resource
     private RedisComponent redisComponent;
+    @Resource
+    private ChannelContextUtils channelContextUtils;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
@@ -33,19 +36,19 @@ public class HandlerTokenValidation extends SimpleChannelInboundHandler<FullHttp
             sendErrorResponse(ctx);
             return;
         }
-        String token=tokens.get(0);
-        TokenUserInfoDto tokenUserInfoDto=checkToken(token);
-        if (tokenUserInfoDto==null){
-            log.error("校验token失败{}",token);
+        String token = tokens.get(0);
+        TokenUserInfoDto tokenUserInfoDto = checkToken(token);
+        if (tokenUserInfoDto == null) {
+            log.error("校验token失败{}", token);
             sendErrorResponse(ctx);
             return;
         }
         ctx.fireChannelRead(request.retain());
-        //TODO 连接成功后初始化工作
+        channelContextUtils.addContext(tokenUserInfoDto.getUserId(), ctx.channel());
     }
 
     private TokenUserInfoDto checkToken(String token) {
-        if(StringUtils.isEmpty(token)){
+        if (StringUtils.isEmpty(token)) {
             return null;
         }
         TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDto(token);
