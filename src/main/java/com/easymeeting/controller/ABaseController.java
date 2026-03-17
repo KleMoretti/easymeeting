@@ -58,4 +58,8 @@ public class ABaseController {
         TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDto(token);
         return tokenUserInfoDto;
     }
+
+    protected  void resetTokenUserInfo(TokenUserInfoDto tokenUserInfoDto){
+        redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);
+    }
 }
