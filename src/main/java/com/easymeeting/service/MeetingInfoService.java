@@ -25,7 +25,7 @@ public interface MeetingInfoService{
 	/**
 	 * 分页查询
 	 */
-	PageinationResultVO<MeetingInfo> findPageByPage(MeetingInfoQuery param);
+	PageinationResultVO<MeetingInfo> findListByPage(MeetingInfoQuery param);
 
 	/**
 	 * 新增

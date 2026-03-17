@@ -25,7 +25,7 @@ public interface MeetingMemberService{
 	/**
 	 * 分页查询
 	 */
-	PageinationResultVO<MeetingMember> findPageByPage(MeetingMemberQuery param);
+	PageinationResultVO<MeetingMember> findListByPage(MeetingMemberQuery param);
 
 	/**
 	 * 新增

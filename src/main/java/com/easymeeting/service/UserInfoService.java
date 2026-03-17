@@ -27,7 +27,7 @@ public interface UserInfoService{
 	/**
 	 * 分页查询
 	 */
-	PageinationResultVO<UserInfo> findPageByPage(UserInfoQuery param);
+	PageinationResultVO<UserInfo> findListByPage(UserInfoQuery param);
 
 	/**
 	 * 新增

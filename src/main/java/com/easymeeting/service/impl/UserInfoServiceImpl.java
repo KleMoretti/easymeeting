@@ -59,7 +59,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     /**
      * 分页查询
      */
-    public PageinationResultVO<UserInfo> findPageByPage(UserInfoQuery param) {
+    public PageinationResultVO<UserInfo> findListByPage(UserInfoQuery param) {
         Integer count = this.findCountByParam(param);
         Integer pageSize = param.getPageSize() == null ? PageSize.SIZE15.getSize() : param.getPageSize();
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);

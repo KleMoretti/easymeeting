@@ -78,6 +78,25 @@ public class MeetingInfoQuery extends BaseQuery{
 	 */
 	private Integer status;
 
+	private String userId;
+	private Boolean queryMemberCount;
+
+	public Boolean getQueryMemberCount() {
+		return queryMemberCount;
+	}
+
+	public void setQueryMemberCount(Boolean queryMemberCount) {
+		this.queryMemberCount = queryMemberCount;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 	public void setMeetingId(String meetingId) {
 		this.meetingId = meetingId;
 	}

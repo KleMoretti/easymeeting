@@ -39,7 +39,7 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
 	/**
 	 * 分页查询
 	 */
-	public PageinationResultVO<MeetingInfo> findPageByPage(MeetingInfoQuery param ) {
+	public PageinationResultVO<MeetingInfo> findListByPage(MeetingInfoQuery param ) {
 		Integer count = this.findCountByParam(param);
 		Integer pageSize = param.getPageSize() == null ? PageSize.SIZE15.getSize() : param.getPageSize();
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);

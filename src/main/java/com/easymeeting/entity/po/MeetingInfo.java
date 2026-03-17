@@ -11,150 +11,160 @@ import java.io.Serializable;
 
 
 /**
- * @Description: 
+ * @Description:
  * @author: klein
  * @data: 2026/03/16
  */
 public class MeetingInfo implements Serializable {
-	/**
-	 * 
-	 */
-	private String meetingId;
+    /**
+     *
+     */
+    private String meetingId;
 
-	/**
-	 * 
-	 */
-	private String meetingNo;
+    /**
+     *
+     */
+    private String meetingNo;
 
-	/**
-	 * 
-	 */
-	private String meetingName;
+    /**
+     *
+     */
+    private String meetingName;
 
-	/**
-	 * 
-	 */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date createTime;
+    /**
+     *
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
 
-	/**
-	 * 
-	 */
-	private String createUserId;
+    /**
+     *
+     */
+    private String createUserId;
 
-	/**
-	 * 
-	 */
-	private Integer joinType;
+    /**
+     *
+     */
+    private Integer joinType;
 
-	/**
-	 * 
-	 */
-	private String joinPassword;
+    /**
+     *
+     */
+    private String joinPassword;
 
-	/**
-	 * 
-	 */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date startTime;
+    /**
+     *
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
 
-	/**
-	 * 
-	 */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date endTime;
+    /**
+     *
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
 
-	/**
-	 * 
-	 */
-	@JsonIgnore
-	private Integer status;
+    /**
+     *
+     */
+    @JsonIgnore
+    private Integer status;
 
-	public void setMeetingId(String meetingId) {
-		this.meetingId = meetingId;
-	}
+    private Integer memberCount;
 
-	public String getMeetingId(){
-		return this.meetingId;
-	}
+    public Integer getMemberCount() {
+        return memberCount;
+    }
 
-	public void setMeetingNo(String meetingNo) {
-		this.meetingNo = meetingNo;
-	}
+    public void setMemberCount(Integer memberCount) {
+        this.memberCount = memberCount;
+    }
 
-	public String getMeetingNo(){
-		return this.meetingNo;
-	}
+    public void setMeetingId(String meetingId) {
+        this.meetingId = meetingId;
+    }
 
-	public void setMeetingName(String meetingName) {
-		this.meetingName = meetingName;
-	}
+    public String getMeetingId() {
+        return this.meetingId;
+    }
 
-	public String getMeetingName(){
-		return this.meetingName;
-	}
+    public void setMeetingNo(String meetingNo) {
+        this.meetingNo = meetingNo;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public String getMeetingNo() {
+        return this.meetingNo;
+    }
 
-	public Date getCreateTime(){
-		return this.createTime;
-	}
+    public void setMeetingName(String meetingName) {
+        this.meetingName = meetingName;
+    }
 
-	public void setCreateUserId(String createUserId) {
-		this.createUserId = createUserId;
-	}
+    public String getMeetingName() {
+        return this.meetingName;
+    }
 
-	public String getCreateUserId(){
-		return this.createUserId;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public void setJoinType(Integer joinType) {
-		this.joinType = joinType;
-	}
+    public Date getCreateTime() {
+        return this.createTime;
+    }
 
-	public Integer getJoinType(){
-		return this.joinType;
-	}
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
 
-	public void setJoinPassword(String joinPassword) {
-		this.joinPassword = joinPassword;
-	}
+    public String getCreateUserId() {
+        return this.createUserId;
+    }
 
-	public String getJoinPassword(){
-		return this.joinPassword;
-	}
+    public void setJoinType(Integer joinType) {
+        this.joinType = joinType;
+    }
 
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
+    public Integer getJoinType() {
+        return this.joinType;
+    }
 
-	public Date getStartTime(){
-		return this.startTime;
-	}
+    public void setJoinPassword(String joinPassword) {
+        this.joinPassword = joinPassword;
+    }
 
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
-	}
+    public String getJoinPassword() {
+        return this.joinPassword;
+    }
 
-	public Date getEndTime(){
-		return this.endTime;
-	}
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
+    public Date getStartTime() {
+        return this.startTime;
+    }
 
-	public Integer getStatus(){
-		return this.status;
-	}
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
-	@Override
-	public String toString() {
-		return ": " + (meetingId == null ? "空" : meetingId) + ",: " + (meetingNo == null ? "空" : meetingNo) + ",: " + (meetingName == null ? "空" : meetingName) + ",: " + (createTime == null ? "空" : DataUtils.format(createTime,DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern())) + ",: " + (createUserId == null ? "空" : createUserId) + ",: " + (joinType == null ? "空" : joinType) + ",: " + (joinPassword == null ? "空" : joinPassword) + ",: " + (startTime == null ? "空" : DataUtils.format(startTime,DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern())) + ",: " + (endTime == null ? "空" : DataUtils.format(endTime,DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern())) + ",: " + (status == null ? "空" : status); 
-	}
+    public Date getEndTime() {
+        return this.endTime;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getStatus() {
+        return this.status;
+    }
+
+    @Override
+    public String toString() {
+        return ": " + (meetingId == null ? "空" : meetingId) + ",: " + (meetingNo == null ? "空" : meetingNo) + ",: " + (meetingName == null ? "空" : meetingName) + ",: " + (createTime == null ? "空" : DataUtils.format(createTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern())) + ",: " + (createUserId == null ? "空" : createUserId) + ",: " + (joinType == null ? "空" : joinType) + ",: " + (joinPassword == null ? "空" : joinPassword) + ",: " + (startTime == null ? "空" : DataUtils.format(startTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern())) + ",: " + (endTime == null ? "空" : DataUtils.format(endTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern())) + ",: " + (status == null ? "空" : status);
+    }
 }
