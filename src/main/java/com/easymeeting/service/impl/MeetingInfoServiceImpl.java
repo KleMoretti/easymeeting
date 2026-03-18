@@ -19,6 +19,7 @@ import com.easymeeting.service.MeetingInfoService;
 
 import com.easymeeting.utils.StringTools;
 import com.easymeeting.websocket.ChannelContextUtils;
+import com.easymeeting.websocket.message.MessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,9 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
     private MeetingMemberMapper<MeetingMember, MeetingMemberQuery> meetingMemberMapper;
     @Autowired
     private RedisComponent redisComponent;
+
+    @Resource
+    private MessageHandler  messageHandler;
 
     /**
      * 根据条件查询列表
@@ -191,7 +195,7 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
         messageSendDto.setMeetingId(meetingId);
         messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());
         messageSendDto.setMessageContent(meetingJoinDto);
-        channelContextUtils.sendMessage(messageSendDto);
+        messageHandler.sendMessage(messageSendDto);
     }
 
     @Override

@@ -43,7 +43,7 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame) throws Exception {
         String text = textWebSocketFrame.text();
-        log.error("收到消息{}", text);
+        //log.error("收到消息{}", text);
         //TODO 处理消息的逻辑
     }
 }

@@ -6,7 +6,8 @@ public enum ResponseCodeEnum {
     CODE_500(500, "服务器异常"),
     CODE_600(600, "请求参数异常"),
     CODE_601(601, "信息已经存在"),
-    CODE_901(901,"登录超时，请重新登陆");
+    CODE_603(603, "数据转化失败"),
+    CODE_901(901, "登录超时，请重新登陆");
 
     private Integer code;
     private String msg;

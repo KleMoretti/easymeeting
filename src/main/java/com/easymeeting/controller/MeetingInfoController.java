@@ -1,14 +1,17 @@
 package com.easymeeting.controller;
 
 import com.easymeeting.annotation.GlobalInterceptor;
+import com.easymeeting.entity.dto.MessageSendDto;
 import com.easymeeting.entity.dto.TokenUserInfoDto;
 import com.easymeeting.entity.po.MeetingInfo;
 import com.easymeeting.entity.query.MeetingInfoQuery;
 import com.easymeeting.entity.vo.PageinationResultVO;
 import com.easymeeting.entity.vo.ResponseVO;
+import com.easymeeting.enums.MessageSend2TypeEnum;
 import com.easymeeting.exception.BusinessException;
 import com.easymeeting.service.MeetingInfoService;
 import com.easymeeting.utils.StringTools;
+import com.easymeeting.websocket.message.MessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +28,9 @@ public class MeetingInfoController extends ABaseController {
 
     @Resource
     private MeetingInfoService meetingInfoService;
+
+    @Resource
+    private MessageHandler messageHandler;
 
     @RequestMapping("/getCurrentMeeting")
     @GlobalInterceptor
@@ -87,7 +93,6 @@ public class MeetingInfoController extends ABaseController {
     @RequestMapping("/joinMeeting")
     @GlobalInterceptor
     public ResponseVO joinMeeting(@NotNull Boolean videoOpen) {
-
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo();
         if (tokenUserInfoDto.getCurrentMeetingId() != null) {
             throw new BusinessException("您当前有会议正在进行中，请先结束当前会议");
