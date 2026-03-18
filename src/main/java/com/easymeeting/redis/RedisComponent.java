@@ -3,6 +3,7 @@ package com.easymeeting.redis;
 import com.easymeeting.entity.constants.Constants;
 import com.easymeeting.entity.dto.MeetingMemberDto;
 import com.easymeeting.entity.dto.TokenUserInfoDto;
+import com.easymeeting.enums.MeetingMemberStatusEnum;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -53,12 +54,23 @@ public class RedisComponent {
 
     public List<MeetingMemberDto> getMeetingMemberList(String meetingId) {
         List<MeetingMemberDto> meetingMemberDtoList = redisUtils.hvals(Constants.REDIS_KEY_MEETING_ROOM + meetingId);
-        meetingMemberDtoList=meetingMemberDtoList.stream().sorted(Comparator.comparing(MeetingMemberDto::getJoinTime)).collect(Collectors.toList());
+        meetingMemberDtoList = meetingMemberDtoList.stream().sorted(Comparator.comparing(MeetingMemberDto::getJoinTime)).collect(Collectors.toList());
         return meetingMemberDtoList;
 
     }
 
-    public MeetingMemberDto getMeetingMember(String meetingId,String userId) {
+    public MeetingMemberDto getMeetingMember(String meetingId, String userId) {
         return (MeetingMemberDto) redisUtils.hget(Constants.REDIS_KEY_MEETING_ROOM + meetingId, userId);
+    }
+
+    public Boolean exitMeeting(String meetingId, String userId, MeetingMemberStatusEnum statusEnum) {
+        MeetingMemberDto meetingMemberDto = getMeetingMember(meetingId, userId);
+        if (meetingMemberDto == null) {
+            return false;
+        }
+        meetingMemberDto.setStatus(statusEnum.getStatus());
+        add2Meeting(meetingId, meetingMemberDto);
+
+        return true;
     }
 }

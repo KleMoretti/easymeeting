@@ -1,12 +1,17 @@
 package com.easymeeting.websocket;
 
 import com.alibaba.fastjson.JSON;
+import com.easymeeting.entity.dto.MeetingExitDto;
+import com.easymeeting.entity.dto.MeetingMemberDto;
 import com.easymeeting.entity.dto.MessageSendDto;
 import com.easymeeting.entity.dto.TokenUserInfoDto;
 import com.easymeeting.entity.po.UserInfo;
+import com.easymeeting.enums.MeetingMemberStatusEnum;
 import com.easymeeting.enums.MessageSend2TypeEnum;
+import com.easymeeting.enums.MessageTypesEnum;
 import com.easymeeting.mappers.UserInfoMapper;
 import com.easymeeting.redis.RedisComponent;
+import com.easymeeting.utils.JsonUtils;
 import com.easymeeting.utils.StringTools;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
@@ -17,6 +22,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -95,6 +101,23 @@ public class ChannelContextUtils {
             return;
         }
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageSendDto)));
+
+        if (MessageTypesEnum.EXIT_MEETING_ROOM.getType().equals(messageSendDto.getMessageSend2Type())) {
+            MeetingExitDto exitDto = JsonUtils.convertJson2Obj((String) messageSendDto.getMessageContent(), MeetingExitDto.class);
+            removeContextFromGroup(messageSendDto.getMeetingId(), exitDto.getExitUserId());
+            List<MeetingMemberDto> meetingMemberList = redisComponent.getMeetingMemberList(messageSendDto.getMeetingId());
+            List<MeetingMemberDto> onLineMemberList = (List<MeetingMemberDto>) meetingMemberList.stream().filter(item -> MeetingMemberStatusEnum.NORMAL.getStatus().equals(item.getStatus()));
+            if (onLineMemberList.isEmpty()) {
+                removeContextGroup(messageSendDto.getMeetingId());
+            }
+            return;
+        }
+        if (MessageTypesEnum.FINIS_MEETING.equals(messageSendDto.getMessageType())) {
+            List<MeetingMemberDto> meetingMemberList = redisComponent.getMeetingMemberList(messageSendDto.getMeetingId());
+            meetingMemberList.forEach(item ->
+                    removeContextFromGroup(messageSendDto.getMeetingId(), item.getUserId()));
+            removeContextGroup(messageSendDto.getMeetingId());
+        }
     }
 
     private void sendMsg2User(MessageSendDto messageSendDto) {
@@ -106,6 +129,21 @@ public class ChannelContextUtils {
             return;
         }
         channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageSendDto)));
+    }
+
+    private void removeContextFromGroup(String meetingId, String userId) {
+        Channel context = USER_CONTEXT_MAP.get(userId);
+        if (null == context) {
+            return;
+        }
+        ChannelGroup group = MEETING_ROOM_CONTEXT_MAP.get(meetingId);
+        if (group != null) {
+            group.remove(context);
+        }
+    }
+
+    private void removeContextGroup(String meetingId) {
+        MEETING_ROOM_CONTEXT_MAP.remove(meetingId);
     }
 
     public void closeContext(String userId) {

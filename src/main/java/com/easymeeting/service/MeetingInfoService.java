@@ -4,6 +4,7 @@ import com.easymeeting.entity.dto.TokenUserInfoDto;
 import com.easymeeting.entity.vo.PageinationResultVO;
 import com.easymeeting.entity.po.MeetingInfo;
 import com.easymeeting.entity.query.MeetingInfoQuery;
+import com.easymeeting.enums.MeetingMemberStatusEnum;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -66,4 +67,6 @@ public interface MeetingInfoService {
     void joinMeeting(String meetingId, String userId, String nickName, Integer sex, Boolean videoOpen);
 
     String preJoinMeeting(String meetingNo, TokenUserInfoDto tokenUserInfoDto, String password);
+
+    void exitMeetingRoom(TokenUserInfoDto tokenUserInfoDto, MeetingMemberStatusEnum statusEnum);
 }

@@ -7,6 +7,7 @@ import com.easymeeting.entity.po.MeetingInfo;
 import com.easymeeting.entity.query.MeetingInfoQuery;
 import com.easymeeting.entity.vo.PageinationResultVO;
 import com.easymeeting.entity.vo.ResponseVO;
+import com.easymeeting.enums.MeetingMemberStatusEnum;
 import com.easymeeting.enums.MessageSend2TypeEnum;
 import com.easymeeting.exception.BusinessException;
 import com.easymeeting.service.MeetingInfoService;
@@ -82,9 +83,9 @@ public class MeetingInfoController extends ABaseController {
     public ResponseVO preJoinMeeting(@NotNull String meetingNo, @NotEmpty String nickName, String password) {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo();
 
-        meetingNo=meetingNo.replace(" ", "");
+        meetingNo = meetingNo.replace(" ", "");
         tokenUserInfoDto.setCurrentMeetingId(meetingNo);
-        String meetingId = meetingInfoService.preJoinMeeting(meetingNo,tokenUserInfoDto,password);
+        String meetingId = meetingInfoService.preJoinMeeting(meetingNo, tokenUserInfoDto, password);
 
         return getSuccessResponseVO(meetingId);
     }
@@ -99,6 +100,15 @@ public class MeetingInfoController extends ABaseController {
         }
         meetingInfoService.joinMeeting(tokenUserInfoDto.getCurrentMeetingId(), tokenUserInfoDto.getUserId(),
                 tokenUserInfoDto.getNickName(), tokenUserInfoDto.getSex(), videoOpen);
+
+        return getSuccessResponseVO(null);
+    }
+
+    @RequestMapping("/exitMeeting")
+    @GlobalInterceptor
+    public ResponseVO exitMeeting() {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo();
+        meetingInfoService.exitMeetingRoom(tokenUserInfoDto, MeetingMemberStatusEnum.EXIT_MEETING);
 
         return getSuccessResponseVO(null);
     }

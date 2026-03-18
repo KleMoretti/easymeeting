@@ -1,9 +1,6 @@
 package com.easymeeting.service.impl;
 
-import com.easymeeting.entity.dto.MeetingJoinDto;
-import com.easymeeting.entity.dto.MeetingMemberDto;
-import com.easymeeting.entity.dto.MessageSendDto;
-import com.easymeeting.entity.dto.TokenUserInfoDto;
+import com.easymeeting.entity.dto.*;
 import com.easymeeting.entity.po.MeetingMember;
 import com.easymeeting.entity.query.MeetingMemberQuery;
 import com.easymeeting.entity.query.SimplePage;
@@ -17,9 +14,11 @@ import com.easymeeting.mappers.MeetingMemberMapper;
 import com.easymeeting.redis.RedisComponent;
 import com.easymeeting.service.MeetingInfoService;
 
+import com.easymeeting.utils.JsonUtils;
 import com.easymeeting.utils.StringTools;
 import com.easymeeting.websocket.ChannelContextUtils;
 import com.easymeeting.websocket.message.MessageHandler;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +48,7 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
     private RedisComponent redisComponent;
 
     @Resource
-    private MessageHandler  messageHandler;
+    private MessageHandler messageHandler;
 
     /**
      * 根据条件查询列表
@@ -226,6 +225,47 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
         tokenUserInfoDto.setCurrentMeetingId(meetingInfo.getMeetingId());
         redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);
         return meetingInfo.getMeetingId();
+    }
 
+    @Override
+    public void exitMeetingRoom(TokenUserInfoDto tokenUserInfoDto, MeetingMemberStatusEnum statusEnum) {
+        String meetingId = tokenUserInfoDto.getCurrentMeetingId();
+        if (StringTools.isEmpty(meetingId)) {
+            return;
+        }
+        String userId = tokenUserInfoDto.getUserId();
+        Boolean exit = redisComponent.exitMeeting(meetingId, userId, statusEnum);
+        if (!exit) {
+            tokenUserInfoDto.setCurrentMeetingId(null);
+            redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);
+            return;
+        }
+        MessageSendDto messageSendDto = new MessageSendDto();
+        messageSendDto.setMessageType(MessageTypesEnum.EXIT_MEETING_ROOM.getType());
+        //清空当前正在进行的会议
+        tokenUserInfoDto.setCurrentMeetingId(null);
+        redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);
+
+        List<MeetingMemberDto> meetingMemberDtoList = redisComponent.getMeetingMemberList(meetingId);
+        MeetingExitDto exitDto = new MeetingExitDto();
+        exitDto.setMeetingMemberList(meetingMemberDtoList);
+        exitDto.setExitUserId(userId);
+        exitDto.setExitStatus(statusEnum.getStatus());
+        messageSendDto.setMessageContent(JsonUtils.convertObj2Json(exitDto));
+        messageSendDto.setMeetingId(meetingId);
+        messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());
+        messageHandler.sendMessage(messageSendDto);
+
+        List<MeetingMemberDto> onLineMemberList = (List<MeetingMemberDto>) meetingMemberDtoList.stream()
+                .filter(item -> MeetingMemberStatusEnum.NORMAL.getStatus().equals(item.getStatus()));
+        if (onLineMemberList.isEmpty()) {
+            //TODO 退出结束会议
+            return;
+        }
+        if (ArrayUtils.contains(new Integer[]{MeetingMemberStatusEnum.KICK_OUT.getStatus(), MeetingMemberStatusEnum.BLACKLIST.getStatus()}, statusEnum.getStatus())) {
+            MeetingMember meetingMember = new MeetingMember();
+            meetingMember.setStatus(statusEnum.getStatus());
+            meetingMemberMapper.updateByMeetingIdAndUserId(meetingMember, meetingId, userId);
+        }
     }
 }
