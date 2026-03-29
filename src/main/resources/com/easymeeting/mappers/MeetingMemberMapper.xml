@@ -263,7 +263,56 @@
 			</if>
 		</set>
 		where meeting_id=#{meetingId} and user_id=#{userId}	</update>
-	<!--根据MeetingIdAndUserId删除-->
+    <update id="updateByParam">
+		UPDATE meeting_member
+		<set>
+			<if test="bean.meetingId != null">
+				meeting_id = #{bean.meetingId},
+			</if>
+			<if test="bean.userId != null">
+				user_id = #{bean.userId},
+			</if>
+			<if test="bean.nickName != null">
+				nick_name = #{bean.nickName},
+			</if>
+			<if test="bean.lastJoinTime != null">
+				last_join_time = #{bean.lastJoinTime},
+			</if>
+			<if test="bean.status != null">
+				status = #{bean.status},
+			</if>
+			<if test="bean.memberType != null">
+				member_type = #{bean.memberType},
+			</if>
+			<if test="bean.meetingStatus != null">
+				meeting_status = #{bean.meetingStatus},
+			</if>
+		</set>
+		<where>
+			<if test=" query.meetingId != null and query.meetingId != ''">
+				and meeting_id = #{query.meetingId}
+			</if>
+			<if test=" query.userId != null and query.userId != ''">
+				and user_id = #{query.userId}
+			</if>
+			<if test=" query.nickName != null and query.nickName != ''">
+				and nick_name = #{query.nickName}
+			</if>
+			<if test=" query.lastJoinTime != null">
+				and last_join_time = #{query.lastJoinTime}
+			</if>
+			<if test=" query.status != null">
+				and status = #{query.status}
+			</if>
+			<if test=" query.memberType != null">
+				and member_type = #{query.memberType}
+			</if>
+			<if test=" query.meetingStatus != null">
+				and meeting_status = #{query.meetingStatus}
+			</if>
+		</where>
+	</update>
+    <!--根据MeetingIdAndUserId删除-->
 	<delete id="deleteByMeetingIdAndUserId" >
 		DELETE from meeting_member where meeting_id=#{meetingId} and user_id=#{userId}
 	</delete>

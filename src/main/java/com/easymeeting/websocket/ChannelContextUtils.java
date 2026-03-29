@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -56,7 +57,7 @@ public class ChannelContextUtils {
             userInfoMapper.updateByUserId(userInfo, userId);
 
             TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDtoByUserId(userId);
-            if (tokenUserInfoDto.getCurrentMeetingId() == null) {
+            if (tokenUserInfoDto == null || tokenUserInfoDto.getCurrentMeetingId() == null) {
                 return;
             }
             addMeetingRoom(tokenUserInfoDto.getCurrentMeetingId(), userId);
@@ -83,6 +84,15 @@ public class ChannelContextUtils {
     }
 
     public void sendMessage(MessageSendDto messageSendDto) {
+        if (messageSendDto == null) {
+            return;
+        }
+        if (messageSendDto.getMessageId() == null) {
+            messageSendDto.setMessageId(System.currentTimeMillis());
+        }
+        if (messageSendDto.getSendTime() == null) {
+            messageSendDto.setSendTime(System.currentTimeMillis());
+        }
         if (MessageSend2TypeEnum.USER.getType().equals(messageSendDto.getMessageSend2Type())) {
             sendMsg2User(messageSendDto);
         } else {
@@ -91,31 +101,45 @@ public class ChannelContextUtils {
 
     }
 
-    //TODO 补充
     private void sendMsg2Group(MessageSendDto messageSendDto) {
-        if (messageSendDto.getMessageId() == null) {
-            return;
-        }
         ChannelGroup group = MEETING_ROOM_CONTEXT_MAP.get(messageSendDto.getMeetingId());
         if (group == null) {
             return;
         }
         group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageSendDto)));
 
-        if (MessageTypesEnum.EXIT_MEETING_ROOM.getType().equals(messageSendDto.getMessageSend2Type())) {
-            MeetingExitDto exitDto = JsonUtils.convertJson2Obj((String) messageSendDto.getMessageContent(), MeetingExitDto.class);
+        if (MessageTypesEnum.EXIT_MEETING_ROOM.getType().equals(messageSendDto.getMessageType())) {
+            MeetingExitDto exitDto;
+            if (messageSendDto.getMessageContent() instanceof String) {
+                exitDto = JsonUtils.convertJson2Obj((String) messageSendDto.getMessageContent(), MeetingExitDto.class);
+            } else {
+                exitDto = JsonUtils.convertJson2Obj(JsonUtils.convertObj2Json(messageSendDto.getMessageContent()),
+                        MeetingExitDto.class);
+            }
+            if (exitDto == null) {
+                return;
+            }
             removeContextFromGroup(messageSendDto.getMeetingId(), exitDto.getExitUserId());
-            List<MeetingMemberDto> meetingMemberList = redisComponent.getMeetingMemberList(messageSendDto.getMeetingId());
-            List<MeetingMemberDto> onLineMemberList = (List<MeetingMemberDto>) meetingMemberList.stream().filter(item -> MeetingMemberStatusEnum.NORMAL.getStatus().equals(item.getStatus()));
+            List<MeetingMemberDto> meetingMemberList = redisComponent
+                    .getMeetingMemberList(messageSendDto.getMeetingId());
+            if (meetingMemberList == null) {
+                meetingMemberList = java.util.Collections.emptyList();
+            }
+            List<MeetingMemberDto> onLineMemberList = meetingMemberList.stream()
+                    .filter(item -> MeetingMemberStatusEnum.NORMAL.getStatus().equals(item.getStatus()))
+                    .collect(Collectors.toList());
             if (onLineMemberList.isEmpty()) {
                 removeContextGroup(messageSendDto.getMeetingId());
             }
             return;
         }
-        if (MessageTypesEnum.FINIS_MEETING.equals(messageSendDto.getMessageType())) {
-            List<MeetingMemberDto> meetingMemberList = redisComponent.getMeetingMemberList(messageSendDto.getMeetingId());
-            meetingMemberList.forEach(item ->
-                    removeContextFromGroup(messageSendDto.getMeetingId(), item.getUserId()));
+        if (MessageTypesEnum.FINIS_MEETING.getType().equals(messageSendDto.getMessageType())) {
+            List<MeetingMemberDto> meetingMemberList = redisComponent
+                    .getMeetingMemberList(messageSendDto.getMeetingId());
+            if (meetingMemberList != null) {
+                meetingMemberList
+                        .forEach(item -> removeContextFromGroup(messageSendDto.getMeetingId(), item.getUserId()));
+            }
             removeContextGroup(messageSendDto.getMeetingId());
         }
     }
@@ -152,6 +176,11 @@ public class ChannelContextUtils {
         }
         Channel channel = USER_CONTEXT_MAP.get(userId);
         USER_CONTEXT_MAP.remove(userId);
+        MEETING_ROOM_CONTEXT_MAP.forEach((meetingId, group) -> {
+            if (group != null && channel != null) {
+                group.remove(channel);
+            }
+        });
         if (channel != null) {
             channel.close();
         }

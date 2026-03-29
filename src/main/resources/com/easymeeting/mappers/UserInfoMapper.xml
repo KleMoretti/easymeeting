@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.easymeeting.mappers.UserInfoMapper">
 	<!--实体映射-->
 	<resultMap id="base_result_map" type="com.easymeeting.entity.po.UserInfo">
@@ -79,10 +79,10 @@
 			and password like concat('%',#{query.passwordFuzzy},'%')
 		</if>
 		<if test=" query.createTimeStart != null and query.createTimeStart!= '' ">
-			<![CDATA[ and create_time >= str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]> 
+			<![CDATA[ and create_time >= str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
 		</if>
 		<if test=" query.createTimeEnd != null and query.createTimeEnd!= '' ">
-			<![CDATA[ and create_time < date_sub(str_to_date(#{query.createTimeEnd}, '%Y-%m-%d'), interval -1 day )]]> 
+			<![CDATA[ and create_time < date_sub(str_to_date(#{query.createTimeEnd}, '%Y-%m-%d'), interval -1 day )]]>
 		</if>
 		<if test=" query.meetingNoFuzzy != null and query.meetingNoFuzzy!= '' ">
 			and meeting_no like concat('%',#{query.meetingNoFuzzy},'%')
@@ -99,290 +99,300 @@
 
 	<!--查询列表-->
 	<select id="selectList" resultMap="base_result_map">
-		SELECT <include refid = "base_column_list" /> FROM user_info <include refid="query_condition" />
-		<if test="query.orderBy != null"> order by ${query.orderBy} </if>
-		<if test="query.simplePage != null"> limit #{query.simplePage.start},#{query.simplePage.pageSize}</if>
-	</select>
+		SELECT <include refid = "base_column_list" />
+ FROM user_info <include refid="query_condition" />
+<if test="query.orderBy != null"> order by ${query.orderBy} </if>
+<if test="query.simplePage != null"> limit #{query.simplePage.start},#{query.simplePage.pageSize}</if>
+</select>
 
-	<!--查询数量-->
-	<select id="selectCount" resultType="java.lang.Integer">
+<!--查询数量-->
+<select id="selectCount" resultType="java.lang.Integer">
 		SELECT count(1) FROM user_info <include refid="query_condition" />
-	</select>
+</select>
 
-	<!--插入（匹配有值的字段）-->
-	<insert id="insert" parameterType="com.easymeeting.entity.po.UserInfo">
+<!--插入（匹配有值的字段）-->
+<insert id="insert" parameterType="com.easymeeting.entity.po.UserInfo">
 
 		INSERT INTO user_info
-		<trim prefix="(" suffix=")" suffixOverrides=",">
-			<if test="bean.userId != null">
+<trim prefix="(" suffix=")" suffixOverrides=",">
+	<if test="bean.userId != null">
 				user_id,
-			</if>
-			<if test="bean.email != null">
+	</if>
+	<if test="bean.email != null">
 				email,
-			</if>
-			<if test="bean.nickName != null">
+	</if>
+	<if test="bean.nickName != null">
 				nick_name,
-			</if>
-			<if test="bean.sex != null">
+	</if>
+	<if test="bean.sex != null">
 				sex,
-			</if>
-			<if test="bean.password != null">
+	</if>
+	<if test="bean.password != null">
 				password,
-			</if>
-			<if test="bean.status != null">
+	</if>
+	<if test="bean.status != null">
 				status,
-			</if>
-			<if test="bean.createTime != null">
+	</if>
+	<if test="bean.createTime != null">
 				create_time,
-			</if>
-			<if test="bean.lastLoginTime != null">
+	</if>
+	<if test="bean.lastLoginTime != null">
 				last_login_time,
-			</if>
-			<if test="bean.lastOffTime != null">
+	</if>
+	<if test="bean.lastOffTime != null">
 				last_off_time,
-			</if>
-			<if test="bean.meetingNo != null">
+	</if>
+	<if test="bean.meetingNo != null">
 				meeting_no,
-			</if>
-		</trim>		<trim prefix="values (" suffix=")" suffixOverrides=",">
-			<if test="bean.userId != null">
+	</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides=",">
+	<if test="bean.userId != null">
 				#{bean.userId},
-			</if>
-			<if test="bean.email != null">
+	</if>
+	<if test="bean.email != null">
 				#{bean.email},
-			</if>
-			<if test="bean.nickName != null">
+	</if>
+	<if test="bean.nickName != null">
 				#{bean.nickName},
-			</if>
-			<if test="bean.sex != null">
+	</if>
+	<if test="bean.sex != null">
 				#{bean.sex},
-			</if>
-			<if test="bean.password != null">
+	</if>
+	<if test="bean.password != null">
 				#{bean.password},
-			</if>
-			<if test="bean.status != null">
+	</if>
+	<if test="bean.status != null">
 				#{bean.status},
-			</if>
-			<if test="bean.createTime != null">
+	</if>
+	<if test="bean.createTime != null">
 				#{bean.createTime},
-			</if>
-			<if test="bean.lastLoginTime != null">
+	</if>
+	<if test="bean.lastLoginTime != null">
 				#{bean.lastLoginTime},
-			</if>
-			<if test="bean.lastOffTime != null">
+	</if>
+	<if test="bean.lastOffTime != null">
 				#{bean.lastOffTime},
-			</if>
-			<if test="bean.meetingNo != null">
+	</if>
+	<if test="bean.meetingNo != null">
 				#{bean.meetingNo},
-			</if>
-		</trim>
-	</insert>
-	<!--插入或者更新（匹配有值的字段）-->
-	<insert id="insertOrUpdate" parameterType="com.easymeeting.entity.po.UserInfo">
+	</if>
+</trim>
+</insert>
+<!--插入或者更新（匹配有值的字段）-->
+<insert id="insertOrUpdate" parameterType="com.easymeeting.entity.po.UserInfo">
 		INSERT INTO user_info
-		<trim prefix="(" suffix=")" suffixOverrides=",">
-			<if test="bean.userId != null">
+<trim prefix="(" suffix=")" suffixOverrides=",">
+	<if test="bean.userId != null">
 				user_id,
-			</if>
-			<if test="bean.email != null">
+	</if>
+	<if test="bean.email != null">
 				email,
-			</if>
-			<if test="bean.nickName != null">
+	</if>
+	<if test="bean.nickName != null">
 				nick_name,
-			</if>
-			<if test="bean.sex != null">
+	</if>
+	<if test="bean.sex != null">
 				sex,
-			</if>
-			<if test="bean.password != null">
+	</if>
+	<if test="bean.password != null">
 				password,
-			</if>
-			<if test="bean.status != null">
+	</if>
+	<if test="bean.status != null">
 				status,
-			</if>
-			<if test="bean.createTime != null">
+	</if>
+	<if test="bean.createTime != null">
 				create_time,
-			</if>
-			<if test="bean.lastLoginTime != null">
+	</if>
+	<if test="bean.lastLoginTime != null">
 				last_login_time,
-			</if>
-			<if test="bean.lastOffTime != null">
+	</if>
+	<if test="bean.lastOffTime != null">
 				last_off_time,
-			</if>
-			<if test="bean.meetingNo != null">
+	</if>
+	<if test="bean.meetingNo != null">
 				meeting_no,
-			</if>
-		</trim>
-		<trim prefix="values (" suffix=")" suffixOverrides=",">
-			<if test="bean.userId != null">
+	</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides=",">
+	<if test="bean.userId != null">
 				#{bean.userId},
-			</if>
-			<if test="bean.email != null">
+	</if>
+	<if test="bean.email != null">
 				#{bean.email},
-			</if>
-			<if test="bean.nickName != null">
+	</if>
+	<if test="bean.nickName != null">
 				#{bean.nickName},
-			</if>
-			<if test="bean.sex != null">
+	</if>
+	<if test="bean.sex != null">
 				#{bean.sex},
-			</if>
-			<if test="bean.password != null">
+	</if>
+	<if test="bean.password != null">
 				#{bean.password},
-			</if>
-			<if test="bean.status != null">
+	</if>
+	<if test="bean.status != null">
 				#{bean.status},
-			</if>
-			<if test="bean.createTime != null">
+	</if>
+	<if test="bean.createTime != null">
 				#{bean.createTime},
-			</if>
-			<if test="bean.lastLoginTime != null">
+	</if>
+	<if test="bean.lastLoginTime != null">
 				#{bean.lastLoginTime},
-			</if>
-			<if test="bean.lastOffTime != null">
+	</if>
+	<if test="bean.lastOffTime != null">
 				#{bean.lastOffTime},
-			</if>
-			<if test="bean.meetingNo != null">
+	</if>
+	<if test="bean.meetingNo != null">
 				#{bean.meetingNo},
-			</if>
-		</trim>
+	</if>
+</trim>
 		ON DUPLICATE KEY UPDATE
-		<trim prefix="" suffix="" suffixOverrides=",">
+<trim prefix="" suffix="" suffixOverrides=",">
 
-			<if test="bean.userId != null">
+	<if test="bean.userId != null">
 				 user_id = VALUES(user_id),
-			</if>
-			<if test="bean.nickName != null">
+	</if>
+	<if test="bean.nickName != null">
 				 nick_name = VALUES(nick_name),
-			</if>
-			<if test="bean.sex != null">
+	</if>
+	<if test="bean.sex != null">
 				 sex = VALUES(sex),
-			</if>
-			<if test="bean.password != null">
+	</if>
+	<if test="bean.password != null">
 				 password = VALUES(password),
-			</if>
-			<if test="bean.status != null">
+	</if>
+	<if test="bean.status != null">
 				 status = VALUES(status),
-			</if>
-			<if test="bean.createTime != null">
+	</if>
+	<if test="bean.createTime != null">
 				 create_time = VALUES(create_time),
-			</if>
-			<if test="bean.lastLoginTime != null">
+	</if>
+	<if test="bean.lastLoginTime != null">
 				 last_login_time = VALUES(last_login_time),
-			</if>
-			<if test="bean.lastOffTime != null">
+	</if>
+	<if test="bean.lastOffTime != null">
 				 last_off_time = VALUES(last_off_time),
-			</if>
-			<if test="bean.meetingNo != null">
+	</if>
+	<if test="bean.meetingNo != null">
 				 meeting_no = VALUES(meeting_no),
-			</if>
-		</trim>
-	</insert>
-	<!--添加（批量插入）-->
-	<insert id="insertBatch" parameterType="com.easymeeting.entity.po.UserInfo" >
+	</if>
+</trim>
+</insert>
+<!--添加（批量插入）-->
+<insert id="insertBatch" parameterType="com.easymeeting.entity.po.UserInfo">
 		INSERT INTO user_info(user_id,email,nick_name,sex,password,status,create_time,last_login_time,last_off_time,meeting_no) VALUES
-		<foreach collection="list" item="item"  separator="," >
+<foreach collection="list" item="item" separator=",">
 			(#{item.userId},#{item.email},#{item.nickName},#{item.sex},#{item.password},#{item.status},#{item.createTime},#{item.lastLoginTime},#{item.lastOffTime},#{item.meetingNo})
-		</foreach>
-	</insert>
-	<!--批量插入或更新（批量插入）-->
-	<insert id="insertOrUpdateBatch" parameterType="com.easymeeting.entity.po.UserInfo" >
+</foreach>
+</insert>
+<!--批量插入或更新（批量插入）-->
+<insert id="insertOrUpdateBatch" parameterType="com.easymeeting.entity.po.UserInfo">
 		INSERT INTO user_info(user_id,email,nick_name,sex,password,status,create_time,last_login_time,last_off_time,meeting_no) VALUES
-		<foreach collection="list" item="item"  separator="," open="(" close=")">
+<foreach collection="list" item="item" separator="," open="(" close=")">
 			#{item.userId},#{item.email},#{item.nickName},#{item.sex},#{item.password},#{item.status},#{item.createTime},#{item.lastLoginTime},#{item.lastOffTime},#{item.meetingNo}
-		</foreach>
+</foreach>
 			ON DUPLICATE KEY UPDATE
 	user_id = VALUES(user_id),email = VALUES(email),nick_name = VALUES(nick_name),sex = VALUES(sex),password = VALUES(password),status = VALUES(status),create_time = VALUES(create_time),last_login_time = VALUES(last_login_time),last_off_time = VALUES(last_off_time),meeting_no = VALUES(meeting_no)
-	</insert>
-	<!--根据主键更新（匹配有值的字段）-->
+</insert>
+<!--根据主键更新（匹配有值的字段）-->
 
-	<!--根据UserId查询-->
-	<select id ="selectByUserId" resultMap="base_result_map" >
-		SELECT <include refid = "base_column_list" /> FROM user_info where user_id=#{userId}
-	</select>
+<!--根据UserId查询-->
+<select id ="selectByUserId" resultMap="base_result_map">
+		SELECT <include refid = "base_column_list" />
+ FROM user_info where user_id=#{userId}
+</select>
 
-	<!--根据UserId更新-->
-	<update id="updateByUserId"  parameterType="com.easymeeting.entity.po.UserInfo" >
+<!--根据UserId更新-->
+<update id="updateByUserId" parameterType="com.easymeeting.entity.po.UserInfo">
 		UPDATE user_info
-		<set>
-			<if test="bean.userId != null">
+<set>
+	<if test="bean.userId != null">
 				user_id = #{bean.userId},
-			</if>
-			<if test="bean.email != null">
+	</if>
+	<if test="bean.email != null">
 				email = #{bean.email},
-			</if>
-			<if test="bean.nickName != null">
+	</if>
+	<if test="bean.nickName != null">
 				nick_name = #{bean.nickName},
-			</if>
-			<if test="bean.sex != null">
+	</if>
+	<if test="bean.sex != null">
 				sex = #{bean.sex},
-			</if>
-			<if test="bean.password != null">
+	</if>
+	<if test="bean.password != null">
 				password = #{bean.password},
-			</if>
-			<if test="bean.status != null">
+	</if>
+	<if test="bean.status != null">
 				status = #{bean.status},
-			</if>
-			<if test="bean.createTime != null">
+	</if>
+	<if test="bean.createTime != null">
 				create_time = #{bean.createTime},
-			</if>
-			<if test="bean.lastLoginTime != null">
+	</if>
+	<if test="bean.lastLoginTime != null">
 				last_login_time = #{bean.lastLoginTime},
-			</if>
-			<if test="bean.lastOffTime != null">
+	</if>
+	<if test="bean.lastOffTime != null">
 				last_off_time = #{bean.lastOffTime},
-			</if>
-			<if test="bean.meetingNo != null">
+	</if>
+	<if test="bean.meetingNo != null">
 				meeting_no = #{bean.meetingNo},
-			</if>
-		</set>
+	</if>
+</set>
 		where user_id=#{userId}	</update>
-	<!--根据UserId删除-->
-	<delete id="deleteByUserId" >
+<!--根据UserId删除-->
+<delete id="deleteByUserId">
 		DELETE from user_info where user_id=#{userId}
-	</delete>
+</delete>
 
-	<!--根据Email查询-->
-	<select id ="selectByEmail" resultMap="base_result_map" >
-		SELECT <include refid = "base_column_list" /> FROM user_info where email=#{email}
-	</select>
+<!--根据Email查询-->
+<select id ="selectByEmail" resultMap="base_result_map">
+		SELECT <include refid = "base_column_list" />
+ FROM user_info where email=#{email}
+</select>
 
-	<!--根据Email更新-->
-	<update id="updateByEmail"  parameterType="com.easymeeting.entity.po.UserInfo" >
+<!--根据Email更新-->
+<update id="updateByEmail" parameterType="com.easymeeting.entity.po.UserInfo">
 		UPDATE user_info
-		<set>
-			<if test="bean.userId != null">
+<set>
+	<if test="bean.userId != null">
 				user_id = #{bean.userId},
-			</if>
-			<if test="bean.email != null">
+	</if>
+	<if test="bean.email != null">
 				email = #{bean.email},
-			</if>
-			<if test="bean.nickName != null">
+	</if>
+	<if test="bean.nickName != null">
 				nick_name = #{bean.nickName},
-			</if>
-			<if test="bean.sex != null">
+	</if>
+	<if test="bean.sex != null">
 				sex = #{bean.sex},
-			</if>
-			<if test="bean.password != null">
+	</if>
+	<if test="bean.password != null">
 				password = #{bean.password},
-			</if>
-			<if test="bean.status != null">
+	</if>
+	<if test="bean.status != null">
 				status = #{bean.status},
-			</if>
-			<if test="bean.createTime != null">
+	</if>
+	<if test="bean.createTime != null">
 				create_time = #{bean.createTime},
-			</if>
-			<if test="bean.lastLoginTime != null">
+	</if>
+	<if test="bean.lastLoginTime != null">
 				last_login_time = #{bean.lastLoginTime},
-			</if>
-			<if test="bean.lastOffTime != null">
+	</if>
+	<if test="bean.lastOffTime != null">
 				last_off_time = #{bean.lastOffTime},
-			</if>
-			<if test="bean.meetingNo != null">
+	</if>
+	<if test="bean.meetingNo != null">
 				meeting_no = #{bean.meetingNo},
-			</if>
-		</set>
+	</if>
+</set>
 		where email=#{email}	</update>
-	<!--根据Email删除-->
-	<delete id="deleteByEmail" >
+<!--根据Email删除-->
+<delete id="deleteByEmail">
 		DELETE from user_info where email=#{email}
-	</delete>
+</delete>
+
+<!--根据会议号查询-->
+<select id ="selectByMeetingNo" resultMap="base_result_map">
+		SELECT <include refid = "base_column_list" />
+ FROM user_info where meeting_no=#{meetingNo}
+</select>
 </mapper>

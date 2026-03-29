@@ -24,4 +24,5 @@ public interface MeetingMemberMapper<T, P> extends BaseMapper {
 	 */
 	Integer deleteByMeetingIdAndUserId(@Param("meetingId") String meetingId, @Param("userId") String userId);
 
+    void updateByParam(T meetingMember, P meetingMemberQuery);
 }

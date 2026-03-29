@@ -46,7 +46,6 @@ public interface MeetingInfoService {
      */
     Integer addOrUpdateBatch(List<MeetingInfo> listBean);
 
-
     /**
      * 根据MeetingId查询
      */
@@ -64,9 +63,25 @@ public interface MeetingInfoService {
 
     void quickMeeting(MeetingInfo meetingInfo, String nickName);
 
-    void joinMeeting(String meetingId, String userId, String nickName, Integer sex, Boolean videoOpen);
+    void joinMeeting(String meetingId, String userId, String nickName, Integer sex, Boolean videoOpen,
+            Boolean audioOpen);
 
     String preJoinMeeting(String meetingNo, TokenUserInfoDto tokenUserInfoDto, String password);
 
     void exitMeetingRoom(TokenUserInfoDto tokenUserInfoDto, MeetingMemberStatusEnum statusEnum);
+
+    void forceExitMeeting(TokenUserInfoDto tokenUserInfoDto, String userId, MeetingMemberStatusEnum statusEnum);
+
+    void finishMeeting(String meetingId, String userId);
+
+    void reserveMeeting(MeetingInfo meetingInfo, String nickName);
+
+    void cancelReserveMeeting(String meetingId, String userId);
+
+    List<MeetingInfo> loadTodayMeeting(String userId);
+
+    void inviteMemberMeeting(String meetingId, String inviteUserId, String receiveUserId, String inviteMessage);
+
+    void updateMediaStatus(TokenUserInfoDto tokenUserInfoDto, Boolean videoOpen, Boolean audioOpen);
+
 }

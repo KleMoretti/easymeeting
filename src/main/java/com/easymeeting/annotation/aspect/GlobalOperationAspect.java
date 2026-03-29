@@ -32,7 +32,7 @@ public class GlobalOperationAspect {
             log.info("GlobalInterceptor aspect triggered for method: {}", point.getSignature().getName());
             Method method = ((MethodSignature) point.getSignature()).getMethod();
             GlobalInterceptor interceptor = method.getAnnotation(GlobalInterceptor.class);
-            if (interceptor != null) {
+            if (interceptor == null) {
                 return;
             }
             if (interceptor.checkLogin() || interceptor.checkAdmin()) {
@@ -48,7 +48,8 @@ public class GlobalOperationAspect {
     }
 
     private void checkLogin(Boolean checkAdmin) {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                .getRequest();
         String token = request.getHeader("token");
         TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDto(token);
         if (tokenUserInfoDto == null) {

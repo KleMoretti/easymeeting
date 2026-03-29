@@ -14,11 +14,12 @@ public enum MessageTypesEnum {
     INVITE_MEMBER_MEETING(9, "邀请入会"),
     FORCE_OFFLINE(10, "强制下线"),
     MEETING_USER_VDEO_CHANGE(11, "用戶视频改变"),
+    MEETING_USER_AUDIO_CHANGE(12, "用户麦克风改变"),
+    MEETING_USER_MEDIA_CHANGE(13, "用户音视频状态改变"),
     ;
 
     private Integer type;
     private String desc;
-
 
     public static MessageTypesEnum getByStatus(Integer status) {
         for (MessageTypesEnum item : values()) {

@@ -2,12 +2,12 @@ package com.easymeeting.enums;
 
 public enum MeetingStatusEnum {
 
-    RUNNING(0,"会议进行中"),
-    FINISHED(1,"会议已结束");
+    RUNNING(0, "会议进行中"),
+    FINISHED(1, "会议已结束"),
+    RESERVED(2, "预约中");
 
     private Integer status;
     private String desc;
-
 
     public static MeetingStatusEnum getByStatus(Integer status) {
         for (MeetingStatusEnum item : values()) {

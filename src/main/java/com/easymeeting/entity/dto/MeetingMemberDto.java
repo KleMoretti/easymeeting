@@ -2,6 +2,7 @@ package com.easymeeting.entity.dto;
 
 public class MeetingMemberDto {
     private Boolean openVideo;
+    private Boolean openAudio;
     private String avatar;
     private String nickName;
     private Integer sex;
@@ -24,6 +25,14 @@ public class MeetingMemberDto {
 
     public void setOpenVideo(Boolean openVideo) {
         this.openVideo = openVideo;
+    }
+
+    public Boolean getOpenAudio() {
+        return openAudio;
+    }
+
+    public void setOpenAudio(Boolean openAudio) {
+        this.openAudio = openAudio;
     }
 
     public String getAvatar() {

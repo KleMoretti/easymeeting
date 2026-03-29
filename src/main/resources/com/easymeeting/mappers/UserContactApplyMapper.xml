@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easymeeting.mappers.UserContactApplyMapper">
+    <resultMap id="base_result_map" type="com.easymeeting.entity.po.UserContactApply">
+        <id column="apply_id" property="applyId"/>
+        <result column="apply_user_id" property="applyUserId"/>
+        <result column="receive_user_id" property="receiveUserId"/>
+        <result column="apply_message" property="applyMessage"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="deal_time" property="dealTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.easymeeting.entity.po.UserContactApply">
+        INSERT INTO user_contact_apply(apply_id,apply_user_id,receive_user_id,apply_message,status,create_time,deal_time)
+        VALUES(#{bean.applyId},#{bean.applyUserId},#{bean.receiveUserId},#{bean.applyMessage},#{bean.status},#{bean.createTime},#{bean.dealTime})
+    </insert>
+
+    <select id="selectByApplyId" resultMap="base_result_map">
+        SELECT apply_id,apply_user_id,receive_user_id,apply_message,status,create_time,deal_time
+        FROM user_contact_apply
+        WHERE apply_id = #{applyId}
+    </select>
+
+    <select id="selectPendingByUsers" resultMap="base_result_map">
+        SELECT apply_id,apply_user_id,receive_user_id,apply_message,status,create_time,deal_time
+        FROM user_contact_apply
+        WHERE apply_user_id = #{applyUserId}
+          AND receive_user_id = #{receiveUserId}
+          AND status = 0
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <update id="updateByApplyId" parameterType="com.easymeeting.entity.po.UserContactApply">
+        UPDATE user_contact_apply
+        <set>
+            <if test="bean.applyMessage != null">apply_message = #{bean.applyMessage},</if>
+            <if test="bean.status != null">status = #{bean.status},</if>
+            <if test="bean.dealTime != null">deal_time = #{bean.dealTime},</if>
+        </set>
+        WHERE apply_id = #{applyId}
+    </update>
+
+    <select id="selectDealWithCount" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM user_contact_apply
+        WHERE receive_user_id = #{receiveUserId}
+          AND status = 0
+    </select>
+
+    <select id="selectListByReceiveUserId" resultMap="base_result_map">
+        SELECT apply_id,apply_user_id,receive_user_id,apply_message,status,create_time,deal_time
+        FROM user_contact_apply
+        WHERE receive_user_id = #{receiveUserId}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+</mapper>

@@ -7,13 +7,16 @@ import com.easymeeting.entity.dto.PeerMessageDto;
 import com.easymeeting.entity.dto.TokenUserInfoDto;
 import com.easymeeting.entity.po.UserInfo;
 import com.easymeeting.entity.query.UserInfoQuery;
+import com.easymeeting.enums.MeetingMemberStatusEnum;
 import com.easymeeting.enums.MessageSend2TypeEnum;
 import com.easymeeting.enums.MessageTypesEnum;
 import com.easymeeting.mappers.UserInfoMapper;
 import com.easymeeting.redis.RedisComponent;
+import com.easymeeting.service.MeetingInfoService;
 import com.easymeeting.utils.JsonUtils;
+import com.easymeeting.utils.StringTools;
+import com.easymeeting.websocket.ChannelContextUtils;
 import com.easymeeting.websocket.message.MessageHandler;
-import com.rabbitmq.tools.json.JSONUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -21,7 +24,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -37,6 +39,10 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
     private RedisComponent redisComponent;
     @Resource
     private MessageHandler messageHandler;
+    @Resource
+    private MeetingInfoService meetingInfoService;
+    @Resource
+    private ChannelContextUtils channelContextUtils;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -47,31 +53,46 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         log.info("有链接断开");
-        //TODO 处理连接断开的逻辑
         Attribute<String> attribute = ctx.channel().attr(AttributeKey.valueOf(ctx.channel().id().toString()));
         String userId = attribute.get();
-        UserInfo userInfo = new UserInfo();
-        userInfo.setLastOffTime(System.currentTimeMillis());
-        userInfoMapper.updateByUserId(userInfo, userId);
+        if (!StringTools.isEmpty(userId)) {
+            UserInfo userInfo = new UserInfo();
+            userInfo.setLastOffTime(System.currentTimeMillis());
+            userInfoMapper.updateByUserId(userInfo, userId);
+
+            TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDtoByUserId(userId);
+            if (tokenUserInfoDto != null && !StringTools.isEmpty(tokenUserInfoDto.getCurrentMeetingId())) {
+                try {
+                    meetingInfoService.exitMeetingRoom(tokenUserInfoDto, MeetingMemberStatusEnum.EXIT_MEETING);
+                } catch (Exception e) {
+                    log.error("用户掉线退会失败,userId={}", userId, e);
+                }
+            }
+            channelContextUtils.closeContext(userId);
+        }
         super.channelInactive(ctx);
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame)
+            throws Exception {
         String text = textWebSocketFrame.text();
 
-        if(Constants.PING.equals(text)){
+        if (Constants.PING.equals(text)) {
             return;
         }
-        log.error("收到消息{}", text);
-        PeerConnectionDataDto dataDto= JsonUtils.convertJson2Obj(text, PeerConnectionDataDto.class);
-        TokenUserInfoDto tokenUserInfoDto=redisComponent.getTokenUserInfoDto(dataDto.getToken());
-        if(tokenUserInfoDto==null){
+        log.info("收到ws消息{}", text);
+        PeerConnectionDataDto dataDto = JsonUtils.convertJson2Obj(text, PeerConnectionDataDto.class);
+        if (dataDto == null || StringTools.isEmpty(dataDto.getToken())) {
             return;
         }
-        MessageSendDto messageSendDto=new MessageSendDto();
+        TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDto(dataDto.getToken());
+        if (tokenUserInfoDto == null || StringTools.isEmpty(tokenUserInfoDto.getCurrentMeetingId())) {
+            return;
+        }
+        MessageSendDto messageSendDto = new MessageSendDto();
         messageSendDto.setMessageType(MessageTypesEnum.PEER.getType());
-        PeerMessageDto peerMessageDto=new PeerMessageDto();
+        PeerMessageDto peerMessageDto = new PeerMessageDto();
         peerMessageDto.setSignalType(dataDto.getSignalType());
         peerMessageDto.setSignalData(dataDto.getSignalData());
 
@@ -80,10 +101,13 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
         messageSendDto.setMeetingId(tokenUserInfoDto.getCurrentMeetingId());
         messageSendDto.setSendUserId(tokenUserInfoDto.getUserId());
         messageSendDto.setReceiveUserId(dataDto.getReceiveUserId());
-        messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.USER.getType());
+        if (StringTools.isEmpty(dataDto.getReceiveUserId())) {
+            messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());
+        } else {
+            messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.USER.getType());
+        }
 
         messageHandler.sendMessage(messageSendDto);
     }
-
 
 }

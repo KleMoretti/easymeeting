@@ -39,4 +39,9 @@ public interface UserInfoMapper<T, P> extends BaseMapper {
 	 */
 	Integer deleteByEmail(@Param("email") String email);
 
+	/**
+	 * 根据会议号查询
+	 */
+	T selectByMeetingNo(@Param("meetingNo") String meetingNo);
+
 }
