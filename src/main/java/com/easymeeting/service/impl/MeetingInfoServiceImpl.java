@@ -2,6 +2,7 @@ package com.easymeeting.service.impl;
 
 import com.easymeeting.entity.dto.*;
 import com.easymeeting.entity.po.MeetingMember;
+import com.easymeeting.entity.po.MeetingInviteRecord;
 import com.easymeeting.entity.query.MeetingMemberQuery;
 import com.easymeeting.entity.query.SimplePage;
 import com.easymeeting.entity.vo.PageinationResultVO;
@@ -10,6 +11,7 @@ import com.easymeeting.entity.po.MeetingInfo;
 import com.easymeeting.entity.query.MeetingInfoQuery;
 import com.easymeeting.exception.BusinessException;
 import com.easymeeting.mappers.MeetingInfoMapper;
+import com.easymeeting.mappers.MeetingInviteRecordMapper;
 import com.easymeeting.mappers.MeetingMemberMapper;
 import com.easymeeting.redis.RedisComponent;
 import com.easymeeting.service.MeetingInfoService;
@@ -40,13 +42,12 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
     @Resource
     private ChannelContextUtils channelContextUtils;
 
-    /*
-     * @Resource
-     * private MessageHandler messageHandler;
-     */
-
     @Resource
     private MeetingInfoMapper<MeetingInfo, MeetingInfoQuery> meetingInfoMapper;
+
+    @Resource
+    private MeetingInviteRecordMapper meetingInviteRecordMapper;
+
     @Resource
     private MeetingMemberMapper<MeetingMember, MeetingMemberQuery> meetingMemberMapper;
     @Autowired
@@ -258,6 +259,14 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
         messageHandler.sendMessage(messageSendDto);
     }
 
+    private void acceptMeetingInviteIfExists(String meetingId, String receiveUserId) {
+        MeetingInviteRecord updateInvite = new MeetingInviteRecord();
+        updateInvite.setStatus(MeetingInviteStatusEnum.ACCEPT.getStatus());
+        updateInvite.setDealTime(new Date());
+        meetingInviteRecordMapper.updateByMeetingIdAndReceiveUserIdAndStatus(updateInvite, meetingId, receiveUserId,
+                MeetingInviteStatusEnum.PENDING.getStatus());
+    }
+
     @Override
     public void joinMeeting(String meetingId, String userId, String nickName, Integer sex, Boolean videoOpen,
             Boolean audioOpen) {
@@ -273,6 +282,8 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
 
         this.add2Meeting(meetingId, userId, nickName, sex, memberTypeEnum.getType(), videoOpen,
                 audioOpen == null ? Boolean.TRUE : audioOpen);
+
+        acceptMeetingInviteIfExists(meetingId, userId);
 
         channelContextUtils.addMeetingRoom(meetingId, userId);
         MeetingJoinDto meetingJoinDto = new MeetingJoinDto();
@@ -444,6 +455,7 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
     }
 
     @Override
+    @Transactional
     public void inviteMemberMeeting(String meetingId, String inviteUserId, String receiveUserId, String inviteMessage) {
         if (StringTools.isEmpty(meetingId) || StringTools.isEmpty(inviteUserId) || StringTools.isEmpty(receiveUserId)) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
@@ -472,7 +484,27 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
         if (meetingInfo == null) {
             throw new BusinessException("会议不存在");
         }
+
+        MeetingInviteRecord pendingInvite = meetingInviteRecordMapper
+                .selectPendingByMeetingIdAndReceiveUserId(meetingId, receiveUserId);
+        if (pendingInvite != null) {
+            throw new BusinessException("该联系人已有待处理邀请");
+        }
+
+        MeetingInviteRecord meetingInviteRecord = new MeetingInviteRecord();
+        meetingInviteRecord.setInviteId(StringTools.getRandomNumber(20));
+        meetingInviteRecord.setMeetingId(meetingId);
+        meetingInviteRecord.setMeetingNo(meetingInfo.getMeetingNo());
+        meetingInviteRecord.setMeetingName(meetingInfo.getMeetingName());
+        meetingInviteRecord.setInviteUserId(inviteUserId);
+        meetingInviteRecord.setReceiveUserId(receiveUserId);
+        meetingInviteRecord.setInviteMessage(inviteMessage);
+        meetingInviteRecord.setStatus(MeetingInviteStatusEnum.PENDING.getStatus());
+        meetingInviteRecord.setCreateTime(new Date());
+        meetingInviteRecordMapper.insert(meetingInviteRecord);
+
         MeetingInviteDto inviteDto = new MeetingInviteDto();
+        inviteDto.setInviteId(meetingInviteRecord.getInviteId());
         inviteDto.setMeetingId(meetingId);
         inviteDto.setMeetingNo(meetingInfo.getMeetingNo());
         inviteDto.setMeetingName(meetingInfo.getMeetingName());
@@ -487,6 +519,64 @@ public class MeetingInfoServiceImpl implements MeetingInfoService {
         messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.USER.getType());
         messageSendDto.setMessageContent(inviteDto);
         messageHandler.sendMessage(messageSendDto);
+    }
+
+    @Override
+    public List<MeetingInviteRecord> loadMyPendingInviteList(String receiveUserId) {
+        if (StringTools.isEmpty(receiveUserId)) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        List<MeetingInviteRecord> list = meetingInviteRecordMapper.selectPendingByReceiveUserId(receiveUserId);
+        if (list == null) {
+            return Collections.emptyList();
+        }
+        return list;
+    }
+
+    @Override
+    @Transactional
+    public void rejectInvite(String inviteId, String receiveUserId) {
+        if (StringTools.isEmpty(inviteId) || StringTools.isEmpty(receiveUserId)) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        MeetingInviteRecord meetingInviteRecord = meetingInviteRecordMapper.selectByInviteId(inviteId);
+        if (meetingInviteRecord == null) {
+            throw new BusinessException("邀请记录不存在");
+        }
+        if (!receiveUserId.equals(meetingInviteRecord.getReceiveUserId())) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if (!MeetingInviteStatusEnum.PENDING.getStatus().equals(meetingInviteRecord.getStatus())) {
+            throw new BusinessException("该邀请已处理");
+        }
+
+        MeetingInviteRecord updateInvite = new MeetingInviteRecord();
+        updateInvite.setStatus(MeetingInviteStatusEnum.REJECT.getStatus());
+        updateInvite.setDealTime(new Date());
+        meetingInviteRecordMapper.updateByInviteId(updateInvite, inviteId);
+    }
+
+    @Override
+    @Transactional
+    public void cancelInvite(String inviteId, String inviteUserId) {
+        if (StringTools.isEmpty(inviteId) || StringTools.isEmpty(inviteUserId)) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        MeetingInviteRecord meetingInviteRecord = meetingInviteRecordMapper.selectByInviteId(inviteId);
+        if (meetingInviteRecord == null) {
+            throw new BusinessException("邀请记录不存在");
+        }
+        if (!inviteUserId.equals(meetingInviteRecord.getInviteUserId())) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if (!MeetingInviteStatusEnum.PENDING.getStatus().equals(meetingInviteRecord.getStatus())) {
+            throw new BusinessException("仅可撤回待处理邀请");
+        }
+
+        MeetingInviteRecord updateInvite = new MeetingInviteRecord();
+        updateInvite.setStatus(MeetingInviteStatusEnum.CANCEL.getStatus());
+        updateInvite.setDealTime(new Date());
+        meetingInviteRecordMapper.updateByInviteId(updateInvite, inviteId);
     }
 
     @Override

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.easymeeting.mappers.MeetingChatMessageMapper">
     <resultMap id="base_result_map" type="com.easymeeting.entity.po.MeetingChatMessage">
         <id column="message_id" property="messageId"/>
@@ -109,129 +109,130 @@
     </sql>
 
     <select id="selectList" resultMap="base_result_map">
-        SELECT <include refid="base_column_list"/> FROM ${tableName}
-        <include refid="query_condition"/>
-        <if test="query.orderBy != null">order by ${query.orderBy}</if>
-        <if test="query.simplePage != null">limit #{query.simplePage.start},#{query.simplePage.pageSize}</if>
-    </select>
+        SELECT <include refid="base_column_list"/>
+ FROM ${tableName}
+    <include refid="query_condition"/>
+    <if test="query.orderBy != null">order by ${query.orderBy}</if>
+    <if test="query.simplePage != null">limit #{query.simplePage.start},#{query.simplePage.pageSize}</if>
+</select>
 
-    <select id="selectCount" resultType="java.lang.Integer">
+<select id="selectCount" resultType="java.lang.Integer">
         SELECT count(1) FROM ${tableName}
-        <include refid="query_condition"/>
-    </select>
+    <include refid="query_condition"/>
+</select>
 
-    <insert id="insert" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
+<insert id="insert" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
         INSERT INTO ${tableName}
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="bean.messageId != null">message_id,</if>
-            <if test="bean.meetingId != null">meeting_id,</if>
-            <if test="bean.messageType != null">message_type,</if>
-            <if test="bean.messageContent != null">message_content,</if>
-            <if test="bean.sendUserId != null">send_user_id,</if>
-            <if test="bean.sendUserNickName != null">send_user_nick_name,</if>
-            <if test="bean.sendTime != null">send_time,</if>
-            <if test="bean.receiveType != null">receive_type,</if>
-            <if test="bean.receiveUserId != null">receive_user_id,</if>
-            <if test="bean.fileSize != null">file_size,</if>
-            <if test="bean.fileName != null">file_name,</if>
-            <if test="bean.fileType != null">file_type,</if>
-            <if test="bean.fileSuffix != null">file_suffix,</if>
-            <if test="bean.status != null">status,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="bean.messageId != null">#{bean.messageId},</if>
-            <if test="bean.meetingId != null">#{bean.meetingId},</if>
-            <if test="bean.messageType != null">#{bean.messageType},</if>
-            <if test="bean.messageContent != null">#{bean.messageContent},</if>
-            <if test="bean.sendUserId != null">#{bean.sendUserId},</if>
-            <if test="bean.sendUserNickName != null">#{bean.sendUserNickName},</if>
-            <if test="bean.sendTime != null">#{bean.sendTime},</if>
-            <if test="bean.receiveType != null">#{bean.receiveType},</if>
-            <if test="bean.receiveUserId != null">#{bean.receiveUserId},</if>
-            <if test="bean.fileSize != null">#{bean.fileSize},</if>
-            <if test="bean.fileName != null">#{bean.fileName},</if>
-            <if test="bean.fileType != null">#{bean.fileType},</if>
-            <if test="bean.fileSuffix != null">#{bean.fileSuffix},</if>
-            <if test="bean.status != null">#{bean.status},</if>
-        </trim>
-    </insert>
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="bean.messageId != null">message_id,</if>
+        <if test="bean.meetingId != null">meeting_id,</if>
+        <if test="bean.messageType != null">message_type,</if>
+        <if test="bean.messageContent != null">message_content,</if>
+        <if test="bean.sendUserId != null">send_user_id,</if>
+        <if test="bean.sendUserNickName != null">send_user_nick_name,</if>
+        <if test="bean.sendTime != null">send_time,</if>
+        <if test="bean.receiveType != null">receive_type,</if>
+        <if test="bean.receiveUserId != null">receive_user_id,</if>
+        <if test="bean.fileSize != null">file_size,</if>
+        <if test="bean.fileName != null">file_name,</if>
+        <if test="bean.fileType != null">file_type,</if>
+        <if test="bean.fileSuffix != null">file_suffix,</if>
+        <if test="bean.status != null">status,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="bean.messageId != null">#{bean.messageId},</if>
+        <if test="bean.meetingId != null">#{bean.meetingId},</if>
+        <if test="bean.messageType != null">#{bean.messageType},</if>
+        <if test="bean.messageContent != null">#{bean.messageContent},</if>
+        <if test="bean.sendUserId != null">#{bean.sendUserId},</if>
+        <if test="bean.sendUserNickName != null">#{bean.sendUserNickName},</if>
+        <if test="bean.sendTime != null">#{bean.sendTime},</if>
+        <if test="bean.receiveType != null">#{bean.receiveType},</if>
+        <if test="bean.receiveUserId != null">#{bean.receiveUserId},</if>
+        <if test="bean.fileSize != null">#{bean.fileSize},</if>
+        <if test="bean.fileName != null">#{bean.fileName},</if>
+        <if test="bean.fileType != null">#{bean.fileType},</if>
+        <if test="bean.fileSuffix != null">#{bean.fileSuffix},</if>
+        <if test="bean.status != null">#{bean.status},</if>
+    </trim>
+</insert>
 
-    <insert id="insertOrUpdate" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
+<insert id="insertOrUpdate" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
         INSERT INTO ${tableName}
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="bean.messageId != null">message_id,</if>
-            <if test="bean.meetingId != null">meeting_id,</if>
-            <if test="bean.messageType != null">message_type,</if>
-            <if test="bean.messageContent != null">message_content,</if>
-            <if test="bean.sendUserId != null">send_user_id,</if>
-            <if test="bean.sendUserNickName != null">send_user_nick_name,</if>
-            <if test="bean.sendTime != null">send_time,</if>
-            <if test="bean.receiveType != null">receive_type,</if>
-            <if test="bean.receiveUserId != null">receive_user_id,</if>
-            <if test="bean.fileSize != null">file_size,</if>
-            <if test="bean.fileName != null">file_name,</if>
-            <if test="bean.fileType != null">file_type,</if>
-            <if test="bean.fileSuffix != null">file_suffix,</if>
-            <if test="bean.status != null">status,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="bean.messageId != null">#{bean.messageId},</if>
-            <if test="bean.meetingId != null">#{bean.meetingId},</if>
-            <if test="bean.messageType != null">#{bean.messageType},</if>
-            <if test="bean.messageContent != null">#{bean.messageContent},</if>
-            <if test="bean.sendUserId != null">#{bean.sendUserId},</if>
-            <if test="bean.sendUserNickName != null">#{bean.sendUserNickName},</if>
-            <if test="bean.sendTime != null">#{bean.sendTime},</if>
-            <if test="bean.receiveType != null">#{bean.receiveType},</if>
-            <if test="bean.receiveUserId != null">#{bean.receiveUserId},</if>
-            <if test="bean.fileSize != null">#{bean.fileSize},</if>
-            <if test="bean.fileName != null">#{bean.fileName},</if>
-            <if test="bean.fileType != null">#{bean.fileType},</if>
-            <if test="bean.fileSuffix != null">#{bean.fileSuffix},</if>
-            <if test="bean.status != null">#{bean.status},</if>
-        </trim>
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="bean.messageId != null">message_id,</if>
+        <if test="bean.meetingId != null">meeting_id,</if>
+        <if test="bean.messageType != null">message_type,</if>
+        <if test="bean.messageContent != null">message_content,</if>
+        <if test="bean.sendUserId != null">send_user_id,</if>
+        <if test="bean.sendUserNickName != null">send_user_nick_name,</if>
+        <if test="bean.sendTime != null">send_time,</if>
+        <if test="bean.receiveType != null">receive_type,</if>
+        <if test="bean.receiveUserId != null">receive_user_id,</if>
+        <if test="bean.fileSize != null">file_size,</if>
+        <if test="bean.fileName != null">file_name,</if>
+        <if test="bean.fileType != null">file_type,</if>
+        <if test="bean.fileSuffix != null">file_suffix,</if>
+        <if test="bean.status != null">status,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="bean.messageId != null">#{bean.messageId},</if>
+        <if test="bean.meetingId != null">#{bean.meetingId},</if>
+        <if test="bean.messageType != null">#{bean.messageType},</if>
+        <if test="bean.messageContent != null">#{bean.messageContent},</if>
+        <if test="bean.sendUserId != null">#{bean.sendUserId},</if>
+        <if test="bean.sendUserNickName != null">#{bean.sendUserNickName},</if>
+        <if test="bean.sendTime != null">#{bean.sendTime},</if>
+        <if test="bean.receiveType != null">#{bean.receiveType},</if>
+        <if test="bean.receiveUserId != null">#{bean.receiveUserId},</if>
+        <if test="bean.fileSize != null">#{bean.fileSize},</if>
+        <if test="bean.fileName != null">#{bean.fileName},</if>
+        <if test="bean.fileType != null">#{bean.fileType},</if>
+        <if test="bean.fileSuffix != null">#{bean.fileSuffix},</if>
+        <if test="bean.status != null">#{bean.status},</if>
+    </trim>
         ON DUPLICATE KEY UPDATE
-        <trim suffixOverrides=",">
-            <if test="bean.meetingId != null">meeting_id = VALUES(meeting_id),</if>
-            <if test="bean.messageType != null">message_type = VALUES(message_type),</if>
-            <if test="bean.messageContent != null">message_content = VALUES(message_content),</if>
-            <if test="bean.sendUserId != null">send_user_id = VALUES(send_user_id),</if>
-            <if test="bean.sendUserNickName != null">send_user_nick_name = VALUES(send_user_nick_name),</if>
-            <if test="bean.sendTime != null">send_time = VALUES(send_time),</if>
-            <if test="bean.receiveType != null">receive_type = VALUES(receive_type),</if>
-            <if test="bean.receiveUserId != null">receive_user_id = VALUES(receive_user_id),</if>
-            <if test="bean.fileSize != null">file_size = VALUES(file_size),</if>
-            <if test="bean.fileName != null">file_name = VALUES(file_name),</if>
-            <if test="bean.fileType != null">file_type = VALUES(file_type),</if>
-            <if test="bean.fileSuffix != null">file_suffix = VALUES(file_suffix),</if>
-            <if test="bean.status != null">status = VALUES(status),</if>
-        </trim>
-    </insert>
+    <trim suffixOverrides=",">
+        <if test="bean.meetingId != null">meeting_id = VALUES(meeting_id),</if>
+        <if test="bean.messageType != null">message_type = VALUES(message_type),</if>
+        <if test="bean.messageContent != null">message_content = VALUES(message_content),</if>
+        <if test="bean.sendUserId != null">send_user_id = VALUES(send_user_id),</if>
+        <if test="bean.sendUserNickName != null">send_user_nick_name = VALUES(send_user_nick_name),</if>
+        <if test="bean.sendTime != null">send_time = VALUES(send_time),</if>
+        <if test="bean.receiveType != null">receive_type = VALUES(receive_type),</if>
+        <if test="bean.receiveUserId != null">receive_user_id = VALUES(receive_user_id),</if>
+        <if test="bean.fileSize != null">file_size = VALUES(file_size),</if>
+        <if test="bean.fileName != null">file_name = VALUES(file_name),</if>
+        <if test="bean.fileType != null">file_type = VALUES(file_type),</if>
+        <if test="bean.fileSuffix != null">file_suffix = VALUES(file_suffix),</if>
+        <if test="bean.status != null">status = VALUES(status),</if>
+    </trim>
+</insert>
 
-    <insert id="insertBatch" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
+<insert id="insertBatch" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
         INSERT INTO ${tableName}(
             message_id,meeting_id,message_type,message_content,send_user_id,send_user_nick_name,
             send_time,receive_type,receive_user_id,file_size,file_name,file_type,file_suffix,status
         ) VALUES
-        <foreach collection="beans" item="item" separator=",">
+    <foreach collection="beans" item="item" separator=",">
             (
             #{item.messageId},#{item.meetingId},#{item.messageType},#{item.messageContent},#{item.sendUserId},#{item.sendUserNickName},
             #{item.sendTime},#{item.receiveType},#{item.receiveUserId},#{item.fileSize},#{item.fileName},#{item.fileType},#{item.fileSuffix},#{item.status}
             )
-        </foreach>
-    </insert>
+    </foreach>
+</insert>
 
-    <insert id="insertOrUpdateBatch" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
+<insert id="insertOrUpdateBatch" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
         INSERT INTO ${tableName}(
             message_id,meeting_id,message_type,message_content,send_user_id,send_user_nick_name,
             send_time,receive_type,receive_user_id,file_size,file_name,file_type,file_suffix,status
         ) VALUES
-        <foreach collection="list" item="item" separator=",">
+    <foreach collection="list" item="item" separator=",">
             (
             #{item.messageId},#{item.meetingId},#{item.messageType},#{item.messageContent},#{item.sendUserId},#{item.sendUserNickName},
             #{item.sendTime},#{item.receiveType},#{item.receiveUserId},#{item.fileSize},#{item.fileName},#{item.fileType},#{item.fileSuffix},#{item.status}
             )
-        </foreach>
+    </foreach>
         ON DUPLICATE KEY UPDATE
         meeting_id = VALUES(meeting_id),
         message_type = VALUES(message_type),
@@ -246,30 +247,30 @@
         file_type = VALUES(file_type),
         file_suffix = VALUES(file_suffix),
         status = VALUES(status)
-    </insert>
+</insert>
 
-    <update id="updateByParam" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
+<update id="updateByParam" parameterType="com.easymeeting.entity.po.MeetingChatMessage">
         UPDATE ${tableName}
-        <set>
-            <if test="bean.meetingId != null">meeting_id = #{bean.meetingId},</if>
-            <if test="bean.messageType != null">message_type = #{bean.messageType},</if>
-            <if test="bean.messageContent != null">message_content = #{bean.messageContent},</if>
-            <if test="bean.sendUserId != null">send_user_id = #{bean.sendUserId},</if>
-            <if test="bean.sendUserNickName != null">send_user_nick_name = #{bean.sendUserNickName},</if>
-            <if test="bean.sendTime != null">send_time = #{bean.sendTime},</if>
-            <if test="bean.receiveType != null">receive_type = #{bean.receiveType},</if>
-            <if test="bean.receiveUserId != null">receive_user_id = #{bean.receiveUserId},</if>
-            <if test="bean.fileSize != null">file_size = #{bean.fileSize},</if>
-            <if test="bean.fileName != null">file_name = #{bean.fileName},</if>
-            <if test="bean.fileType != null">file_type = #{bean.fileType},</if>
-            <if test="bean.fileSuffix != null">file_suffix = #{bean.fileSuffix},</if>
-            <if test="bean.status != null">status = #{bean.status},</if>
-        </set>
-        <include refid="query_condition"/>
-    </update>
+    <set>
+        <if test="bean.meetingId != null">meeting_id = #{bean.meetingId},</if>
+        <if test="bean.messageType != null">message_type = #{bean.messageType},</if>
+        <if test="bean.messageContent != null">message_content = #{bean.messageContent},</if>
+        <if test="bean.sendUserId != null">send_user_id = #{bean.sendUserId},</if>
+        <if test="bean.sendUserNickName != null">send_user_nick_name = #{bean.sendUserNickName},</if>
+        <if test="bean.sendTime != null">send_time = #{bean.sendTime},</if>
+        <if test="bean.receiveType != null">receive_type = #{bean.receiveType},</if>
+        <if test="bean.receiveUserId != null">receive_user_id = #{bean.receiveUserId},</if>
+        <if test="bean.fileSize != null">file_size = #{bean.fileSize},</if>
+        <if test="bean.fileName != null">file_name = #{bean.fileName},</if>
+        <if test="bean.fileType != null">file_type = #{bean.fileType},</if>
+        <if test="bean.fileSuffix != null">file_suffix = #{bean.fileSuffix},</if>
+        <if test="bean.status != null">status = #{bean.status},</if>
+    </set>
+    <include refid="query_condition"/>
+</update>
 
-    <delete id="deleteByParam">
+<delete id="deleteByParam">
         DELETE FROM ${tableName}
-        <include refid="query_condition"/>
-    </delete>
+    <include refid="query_condition"/>
+</delete>
 </mapper>

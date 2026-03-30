@@ -49,9 +49,13 @@ public class HandlerTokenValidation extends SimpleChannelInboundHandler<FullHttp
 
     private TokenUserInfoDto checkToken(String token) {
         if (StringUtils.isEmpty(token)) {
+            log.warn("token为空，拒绝WebSocket连接");
             return null;
         }
         TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDto(token);
+        if (tokenUserInfoDto == null) {
+            log.warn("token未命中缓存，可能已失效, token={}", token);
+        }
         return tokenUserInfoDto;
 
     }

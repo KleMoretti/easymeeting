@@ -19,17 +19,17 @@ public class RedissonConfig {
     @Value("${spring.redis.port:}")
     private Integer redisPort;
 
-    @Bean(name="redissonClient",destroyMethod = "shutdown")
+    @Bean(name = "redissonClient", destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
-        try{
+        try {
             Config config = new Config();
             config.useSingleServer().setAddress("redis://" + redisHost + ":" + redisPort);
-            RedissonClient redissonClient= Redisson.create(config);
+            RedissonClient redissonClient = Redisson.create(config);
             return redissonClient;
-        }catch (Exception e){
-            log.error("初始化RedissonClient失败",e);
+        } catch (Exception e) {
+            log.error("初始化RedissonClient失败", e);
+            throw new IllegalStateException("初始化RedissonClient失败", e);
         }
-        return null;
     }
 
 }

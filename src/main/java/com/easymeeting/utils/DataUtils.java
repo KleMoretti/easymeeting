@@ -1,11 +1,15 @@
 package com.easymeeting.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DataUtils {
+    private static final Logger logger = LoggerFactory.getLogger(DataUtils.class);
     private static final Object lockObj = new Object();
     private static Map<String, ThreadLocal<SimpleDateFormat>> sdfMap = new HashMap<String, ThreadLocal<SimpleDateFormat>>();
 
@@ -36,7 +40,7 @@ public class DataUtils {
         try {
             return getSdf(patten).parse(dateStr);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("日期解析失败, dateStr={}, pattern={}", dateStr, patten, e);
         }
         return null;
     }

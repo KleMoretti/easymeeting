@@ -102,6 +102,29 @@ public class MeetingInfoController extends ABaseController {
         return getSuccessResponseVO(null);
     }
 
+    @RequestMapping("/loadMyPendingInviteList")
+    @GlobalInterceptor
+    public ResponseVO loadMyPendingInviteList() {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo();
+        return getSuccessResponseVO(meetingInfoService.loadMyPendingInviteList(tokenUserInfoDto.getUserId()));
+    }
+
+    @RequestMapping("/rejectInvite")
+    @GlobalInterceptor
+    public ResponseVO rejectInvite(@NotEmpty String inviteId) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo();
+        meetingInfoService.rejectInvite(inviteId, tokenUserInfoDto.getUserId());
+        return getSuccessResponseVO(null);
+    }
+
+    @RequestMapping("/cancelInvite")
+    @GlobalInterceptor
+    public ResponseVO cancelInvite(@NotEmpty String inviteId) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo();
+        meetingInfoService.cancelInvite(inviteId, tokenUserInfoDto.getUserId());
+        return getSuccessResponseVO(null);
+    }
+
     @RequestMapping("/updateMediaStatus")
     @GlobalInterceptor
     public ResponseVO updateMediaStatus(Boolean videoOpen, Boolean audioOpen) {

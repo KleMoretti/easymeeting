@@ -3,6 +3,7 @@ package com.easymeeting.service;
 import com.easymeeting.entity.dto.TokenUserInfoDto;
 import com.easymeeting.entity.vo.PageinationResultVO;
 import com.easymeeting.entity.po.MeetingInfo;
+import com.easymeeting.entity.po.MeetingInviteRecord;
 import com.easymeeting.entity.query.MeetingInfoQuery;
 import com.easymeeting.enums.MeetingMemberStatusEnum;
 
@@ -81,6 +82,12 @@ public interface MeetingInfoService {
     List<MeetingInfo> loadTodayMeeting(String userId);
 
     void inviteMemberMeeting(String meetingId, String inviteUserId, String receiveUserId, String inviteMessage);
+
+    List<MeetingInviteRecord> loadMyPendingInviteList(String receiveUserId);
+
+    void rejectInvite(String inviteId, String receiveUserId);
+
+    void cancelInvite(String inviteId, String inviteUserId);
 
     void updateMediaStatus(TokenUserInfoDto tokenUserInfoDto, Boolean videoOpen, Boolean audioOpen);
 

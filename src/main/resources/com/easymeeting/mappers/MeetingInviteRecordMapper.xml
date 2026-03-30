@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easymeeting.mappers.MeetingInviteRecordMapper">
+    <resultMap id="base_result_map" type="com.easymeeting.entity.po.MeetingInviteRecord">
+        <id column="invite_id" property="inviteId"/>
+        <result column="meeting_id" property="meetingId"/>
+        <result column="meeting_no" property="meetingNo"/>
+        <result column="meeting_name" property="meetingName"/>
+        <result column="invite_user_id" property="inviteUserId"/>
+        <result column="receive_user_id" property="receiveUserId"/>
+        <result column="invite_message" property="inviteMessage"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="deal_time" property="dealTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.easymeeting.entity.po.MeetingInviteRecord">
+        INSERT INTO meeting_invite_record(
+            invite_id,meeting_id,meeting_no,meeting_name,invite_user_id,receive_user_id,
+            invite_message,status,create_time,deal_time
+        ) VALUES(
+            #{bean.inviteId},#{bean.meetingId},#{bean.meetingNo},#{bean.meetingName},#{bean.inviteUserId},#{bean.receiveUserId},
+            #{bean.inviteMessage},#{bean.status},#{bean.createTime},#{bean.dealTime}
+        )
+    </insert>
+
+    <select id="selectByInviteId" resultMap="base_result_map">
+        SELECT
+            invite_id,meeting_id,meeting_no,meeting_name,invite_user_id,receive_user_id,
+            invite_message,status,create_time,deal_time
+        FROM meeting_invite_record
+        WHERE invite_id = #{inviteId}
+    </select>
+
+    <select id="selectPendingByMeetingIdAndReceiveUserId" resultMap="base_result_map">
+        SELECT
+            invite_id,meeting_id,meeting_no,meeting_name,invite_user_id,receive_user_id,
+            invite_message,status,create_time,deal_time
+        FROM meeting_invite_record
+        WHERE meeting_id = #{meetingId}
+          AND receive_user_id = #{receiveUserId}
+          AND status = 0
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectPendingByReceiveUserId" resultMap="base_result_map">
+        SELECT
+            invite_id,meeting_id,meeting_no,meeting_name,invite_user_id,receive_user_id,
+            invite_message,status,create_time,deal_time
+        FROM meeting_invite_record
+        WHERE receive_user_id = #{receiveUserId}
+          AND status = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="updateByInviteId" parameterType="com.easymeeting.entity.po.MeetingInviteRecord">
+        UPDATE meeting_invite_record
+        <set>
+            <if test="bean.meetingId != null">meeting_id = #{bean.meetingId},</if>
+            <if test="bean.meetingNo != null">meeting_no = #{bean.meetingNo},</if>
+            <if test="bean.meetingName != null">meeting_name = #{bean.meetingName},</if>
+            <if test="bean.inviteUserId != null">invite_user_id = #{bean.inviteUserId},</if>
+            <if test="bean.receiveUserId != null">receive_user_id = #{bean.receiveUserId},</if>
+            <if test="bean.inviteMessage != null">invite_message = #{bean.inviteMessage},</if>
+            <if test="bean.status != null">status = #{bean.status},</if>
+            <if test="bean.createTime != null">create_time = #{bean.createTime},</if>
+            <if test="bean.dealTime != null">deal_time = #{bean.dealTime},</if>
+        </set>
+        WHERE invite_id = #{inviteId}
+    </update>
+
+    <update id="updateByMeetingIdAndReceiveUserIdAndStatus" parameterType="com.easymeeting.entity.po.MeetingInviteRecord">
+        UPDATE meeting_invite_record
+        <set>
+            <if test="bean.status != null">status = #{bean.status},</if>
+            <if test="bean.dealTime != null">deal_time = #{bean.dealTime},</if>
+        </set>
+        WHERE meeting_id = #{meetingId}
+          AND receive_user_id = #{receiveUserId}
+          AND status = #{status}
+    </update>
+</mapper>

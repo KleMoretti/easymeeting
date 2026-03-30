@@ -1,11 +1,20 @@
 package com.easymeeting.entity.dto;
 
 public class MeetingInviteDto {
+    private String inviteId;
     private String meetingId;
     private String meetingNo;
     private String meetingName;
     private String inviteUserId;
     private String inviteMessage;
+
+    public String getInviteId() {
+        return inviteId;
+    }
+
+    public void setInviteId(String inviteId) {
+        this.inviteId = inviteId;
+    }
 
     public String getMeetingId() {
         return meetingId;

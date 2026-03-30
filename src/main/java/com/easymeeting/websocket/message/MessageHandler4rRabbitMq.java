@@ -6,8 +6,6 @@ import com.easymeeting.utils.JsonUtils;
 import com.easymeeting.websocket.ChannelContextUtils;
 import com.rabbitmq.client.*;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RTopic;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -36,19 +35,22 @@ public class MessageHandler4rRabbitMq implements MessageHandler {
     private Integer port;
 
     @Resource
-    private RedissonClient redissonClient;
-    @Resource
     private ChannelContextUtils channelContextUtils;
 
     private ConnectionFactory factory;
     private Connection connection;
     private Channel channel;
 
+    private ConnectionFactory buildConnectionFactory() {
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        connectionFactory.setHost(host);
+        connectionFactory.setPort(port);
+        return connectionFactory;
+    }
+
     @Override
     public void listenMessage() {
-        factory = new ConnectionFactory();
-        factory.setHost(host);
-        factory.setPort(port);
+        factory = buildConnectionFactory();
         try {
             connection = factory.newConnection();
             channel = connection.createChannel();
@@ -61,12 +63,12 @@ public class MessageHandler4rRabbitMq implements MessageHandler {
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 try {
-                    String message = new String(delivery.getBody(), "UTF-8");
-                    log.info("RabbitMq收到消息{}", message + System.currentTimeMillis());
+                    String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+                    log.info("RabbitMq收到消息, payload={}", message);
                     channelContextUtils.sendMessage(JsonUtils.convertJson2Obj(message, MessageSendDto.class));
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 } catch (Exception e) {
-                    log.info("处理消息失败");
+                    log.error("RabbitMq处理消息失败", e);
                     handleFailMessage(channel, delivery, queuqName);
                 }
             };
@@ -74,7 +76,7 @@ public class MessageHandler4rRabbitMq implements MessageHandler {
             });
 
         } catch (Exception e) {
-            log.error("监听消息失败");
+            log.error("RabbitMq监听消息失败", e);
         }
     }
 
@@ -85,7 +87,10 @@ public class MessageHandler4rRabbitMq implements MessageHandler {
         }
         Integer retryCount = 0;
         if (headers.containsKey(RETRY_COUNT_KEY)) {
-            retryCount = (Integer) headers.get(RETRY_COUNT_KEY);
+            Object retryValue = headers.get(RETRY_COUNT_KEY);
+            if (retryValue instanceof Number) {
+                retryCount = ((Number) retryValue).intValue();
+            }
         }
         if (retryCount < MAX_RETRYTIMES) {
             headers.put(RETRY_COUNT_KEY, retryCount + 1);
@@ -93,19 +98,28 @@ public class MessageHandler4rRabbitMq implements MessageHandler {
             channel.basicPublish("", queueName, properties, delivery.getBody());
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         } else {
-            log.info("超过最大重试次数，放弃处理");
+            log.error("超过最大重试次数，放弃处理, queueName={}", queueName);
             channel.basicReject(delivery.getEnvelope().getDeliveryTag(), false);
         }
     }
 
-
     @Override
     public void sendMessage(MessageSendDto messageSendDto) {
-        try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
+        if (messageSendDto == null) {
+            return;
+        }
+        if (messageSendDto.getMessageId() == null) {
+            messageSendDto.setMessageId(System.currentTimeMillis());
+        }
+        if (messageSendDto.getSendTime() == null) {
+            messageSendDto.setSendTime(System.currentTimeMillis());
+        }
+        String message = JsonUtils.convertObj2Json(messageSendDto);
+        ConnectionFactory connectionFactory = buildConnectionFactory();
+        try (Connection connection = connectionFactory.newConnection();
+                Channel channel = connection.createChannel()) {
             channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
-            String message = "这是我发布的一条消息" + System.currentTimeMillis();
-            channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes());
+            channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             log.error("RabbiMq发送消息失败", e);
         }

@@ -32,6 +32,15 @@
         LIMIT 1
     </select>
 
+    <select id="selectLatestByUsers" resultMap="base_result_map">
+        SELECT apply_id,apply_user_id,receive_user_id,apply_message,status,create_time,deal_time
+        FROM user_contact_apply
+        WHERE apply_user_id = #{applyUserId}
+          AND receive_user_id = #{receiveUserId}
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
     <update id="updateByApplyId" parameterType="com.easymeeting.entity.po.UserContactApply">
         UPDATE user_contact_apply
         <set>

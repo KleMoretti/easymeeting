@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 @Service("userContactService")
 public class UserContactServiceImpl implements UserContactService {
 
+    private static final long APPLY_COOLDOWN_MILLIS = 60 * 1000L;
+
     @Resource
     private UserContactMapper userContactMapper;
     @Resource
@@ -68,6 +70,12 @@ public class UserContactServiceImpl implements UserContactService {
         UserContactApply exists = userContactApplyMapper.selectPendingByUsers(applyUserId, receiveUserId);
         if (exists != null) {
             throw new BusinessException("联系人申请已发送，请等待处理");
+        }
+
+        UserContactApply latestApply = userContactApplyMapper.selectLatestByUsers(applyUserId, receiveUserId);
+        if (latestApply != null && latestApply.getCreateTime() != null
+                && (System.currentTimeMillis() - latestApply.getCreateTime().getTime()) < APPLY_COOLDOWN_MILLIS) {
+            throw new BusinessException("申请过于频繁，请稍后再试");
         }
 
         UserContactApply userContactApply = new UserContactApply();
