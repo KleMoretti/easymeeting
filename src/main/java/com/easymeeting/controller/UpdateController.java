@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -48,8 +49,12 @@ public class UpdateController extends ABaseController {
         String latestVersion = extractVersion(latestFile.getName());
         versionVO.setLatestVersion(latestVersion);
         versionVO.setFileName(latestFile.getName());
-        versionVO.setDownloadUrl("/update/download?fileName="
-                + URLEncoder.encode(latestFile.getName(), StandardCharsets.UTF_8.name()));
+        try {
+            versionVO.setDownloadUrl("/update/download?fileName="
+                    + URLEncoder.encode(latestFile.getName(), StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         boolean needUpdate = StringTools.isEmpty(currentVersion) || compareVersion(latestVersion, currentVersion) > 0;
         versionVO.setNeedUpdate(needUpdate);
