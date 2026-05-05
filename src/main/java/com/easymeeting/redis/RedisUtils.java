@@ -8,7 +8,6 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -70,6 +69,21 @@ public class RedisUtils<V> {
             return true;
         } catch (Exception e) {
             logger.error("redis set error,key={},value={}",key,value,e);
+            return false;
+        }
+    }
+
+    public boolean setIfAbsent(String key, V value, long time) {
+        try {
+            Boolean success;
+            if (time > 0) {
+                success = redisTemplate.opsForValue().setIfAbsent(key, value, time, TimeUnit.SECONDS);
+            } else {
+                success = redisTemplate.opsForValue().setIfAbsent(key, value);
+            }
+            return Boolean.TRUE.equals(success);
+        } catch (Exception e) {
+            logger.error("redis setIfAbsent error,key={},value={}", key, value, e);
             return false;
         }
     }

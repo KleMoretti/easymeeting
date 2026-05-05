@@ -2,7 +2,7 @@
 <configuration scan="true" scanPeriod="10 minutes">
     <appender name="stdot" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss,GMT+8} [%p][%c][%M][%L]-> %m%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss,GMT+8} [%p][traceId=%X{traceId}][%c][%M][%L]-> %m%n</pattern>
         </layout>
     </appender>
 
@@ -24,7 +24,7 @@
         </rollingPolicy>
         <encoder>
             <charset>utf-8</charset>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss,GMT+8} [%p][%c][%M][%L]-> %m%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss,GMT+8} [%p][traceId=%X{traceId}][%c][%M][%L]-> %m%n</pattern>
         </encoder>
         <append>false</append>
         <prudent>false</prudent>
