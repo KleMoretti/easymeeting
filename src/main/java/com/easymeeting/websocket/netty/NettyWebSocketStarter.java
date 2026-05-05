@@ -41,6 +41,7 @@ public class NettyWebSocketStarter implements Runnable {
     private HandlerWebSocket handlerWebSocket;
     @Resource
     private AppConfig appConfig;
+    private volatile boolean running = false;
 
     @Override
     public void run() {
@@ -81,19 +82,26 @@ public class NettyWebSocketStarter implements Runnable {
                     });
 
             Channel channel=serverBootstrap.bind(appConfig.getWsPort()).sync().channel();
+            running = true;
             log.info("Netty服务启动成功,端口{}",appConfig.getWsPort());
             channel.closeFuture().sync();
         } catch (Exception e) {
             log.error("NettyWebSocketStarter 启动失败", e);
         } finally {
+            running = false;
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
 
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
     @PreDestroy
     public void close() {
+        running = false;
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }

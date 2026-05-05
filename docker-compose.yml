@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: easymeeting-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: easymeeting
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - easymeeting-mysql-data:/var/lib/mysql
+      - ./src/main/resources/sql:/docker-entrypoint-initdb.d:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  redis:
+    image: redis:7
+    container_name: easymeeting-redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: easymeeting-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  easymeeting:
+    build: .
+    container_name: easymeeting-backend
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 6060
+      WS_PORT: 6061
+      MYSQL_URL: jdbc:mysql://mysql:3306/easymeeting?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: 123456
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      PROJECT_FOLDER: /opt/easymeeting
+      LOG_ROOT_LEVEL: info
+      APP_INSTANCE_ID: docker-node-1
+    ports:
+      - "6060:6060"
+      - "6061:6061"
+    volumes:
+      - easymeeting-files:/opt/easymeeting/file
+      - easymeeting-logs:/opt/easymeeting/logs
+
+volumes:
+  easymeeting-mysql-data:
+  easymeeting-files:
+  easymeeting-logs:
