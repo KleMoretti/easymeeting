@@ -153,6 +153,7 @@ target/
 logs/
 log.path_IS_UNDEFINED/
 src/main/resources/**/application.properties
+!src/main/resources/application.properties
 
 
 .codex/

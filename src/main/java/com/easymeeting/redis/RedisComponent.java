@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -63,12 +64,30 @@ public class RedisComponent {
         return getTokenUserInfoDto(token);
     }
 
+    public void saveUserHeartbeat(String userId) {
+        if (StringTools.isEmpty(userId)) {
+            return;
+        }
+        redisUtils.setex(Constants.REDIS_KEY_WS_USER_HEART_BEAT + userId, System.currentTimeMillis(),
+                Constants.REDIS_KEY_EXPIRES_ONE_MIN);
+    }
+
+    public void cleanUserHeartbeat(String userId) {
+        if (StringTools.isEmpty(userId)) {
+            return;
+        }
+        redisUtils.delete(Constants.REDIS_KEY_WS_USER_HEART_BEAT + userId);
+    }
+
     public void add2Meeting(String meetingId, MeetingMemberDto meetingMemberDto) {
         redisUtils.hset(Constants.REDIS_KEY_MEETING_ROOM + meetingId, meetingMemberDto.getUserId(), meetingMemberDto);
     }
 
     public List<MeetingMemberDto> getMeetingMemberList(String meetingId) {
         List<MeetingMemberDto> meetingMemberDtoList = redisUtils.hvals(Constants.REDIS_KEY_MEETING_ROOM + meetingId);
+        if (meetingMemberDtoList == null) {
+            return Collections.emptyList();
+        }
         meetingMemberDtoList = meetingMemberDtoList.stream().sorted(Comparator.comparing(MeetingMemberDto::getJoinTime))
                 .collect(Collectors.toList());
         return meetingMemberDtoList;

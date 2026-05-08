@@ -42,6 +42,7 @@ public class ChannelContextUtils {
 
     public void addContext(String userId, Channel channel) {
         try {
+            closeContext(userId);
             String channelId = channel.id().toString();
             AttributeKey attributeKey = null;
             if (!AttributeKey.exists(channelId)) {
@@ -168,6 +169,14 @@ public class ChannelContextUtils {
 
     private void removeContextGroup(String meetingId) {
         MEETING_ROOM_CONTEXT_MAP.remove(meetingId);
+    }
+
+    public static int getOnlineUserCount() {
+        return USER_CONTEXT_MAP.size();
+    }
+
+    public static int getMeetingRoomCount() {
+        return MEETING_ROOM_CONTEXT_MAP.size();
     }
 
     public void closeContext(String userId) {

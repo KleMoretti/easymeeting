@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easymeeting.mappers.MeetingEventLogMapper">
+    <insert id="insertOrUpdate" parameterType="com.easymeeting.entity.po.MeetingEventLog">
+        INSERT INTO meeting_event_log (
+            event_id,message_id,meeting_id,user_id,event_type,send_to_type,receive_user_id,
+            status,retry_count,error_reason,create_time,update_time
+        ) VALUES (
+            #{bean.eventId},#{bean.messageId},#{bean.meetingId},#{bean.userId},#{bean.eventType},#{bean.sendToType},
+            #{bean.receiveUserId},#{bean.status},#{bean.retryCount},#{bean.errorReason},#{bean.createTime},#{bean.updateTime}
+        )
+        ON DUPLICATE KEY UPDATE
+            meeting_id = VALUES(meeting_id),
+            user_id = VALUES(user_id),
+            event_type = VALUES(event_type),
+            send_to_type = VALUES(send_to_type),
+            receive_user_id = VALUES(receive_user_id),
+            status = VALUES(status),
+            retry_count = VALUES(retry_count),
+            error_reason = VALUES(error_reason),
+            update_time = VALUES(update_time)
+    </insert>
+
+    <update id="updateStatusByMessageId">
+        UPDATE meeting_event_log
+        SET status = #{status},
+            retry_count = #{retryCount},
+            error_reason = #{errorReason},
+            update_time = now()
+        WHERE message_id = #{messageId}
+    </update>
+</mapper>

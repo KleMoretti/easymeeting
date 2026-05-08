@@ -40,6 +40,7 @@ public class Constants {
 
     public static final String REDIS_KEY_MEETING_ROOM = REDIS_KEY_PREFIX + "meeting:room:";
     public static final String REDIS_KEY_INVITE_NUMBER = REDIS_KEY_PREFIX + "meeting:invite:number:";
+    public static final String REDIS_KEY_MEETING_EVENT_PROCESSED = REDIS_KEY_PREFIX + "meeting:event:processed:";
 
     public static final String REDIS_KEY_SYS_SETTING = REDIS_KEY_PREFIX + "sysSetting:";
 
@@ -53,7 +54,6 @@ public class Constants {
     public static final String APP_EXE_SUFFIX = ".exe";
 
     public static final String MESSAGING_HANDLE_CHANNEL_KEY = "messaging.handle.channel";
-    public static final String MESSAGING_HANDLE_CHANNEL_REDIS = "redis";
     public static final String MESSAGING_HANDLE_CHANNEL_RABBITMQ = "rabbitmq";
 
 

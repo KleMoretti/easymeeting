@@ -59,6 +59,7 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
             UserInfo userInfo = new UserInfo();
             userInfo.setLastOffTime(System.currentTimeMillis());
             userInfoMapper.updateByUserId(userInfo, userId);
+            redisComponent.cleanUserHeartbeat(userId);
 
             TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDtoByUserId(userId);
             if (tokenUserInfoDto != null && !StringTools.isEmpty(tokenUserInfoDto.getCurrentMeetingId())) {
@@ -79,6 +80,9 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
         String text = textWebSocketFrame.text();
 
         if (Constants.PING.equals(text)) {
+            Attribute<String> attribute = channelHandlerContext.channel()
+                    .attr(AttributeKey.valueOf(channelHandlerContext.channel().id().toString()));
+            redisComponent.saveUserHeartbeat(attribute.get());
             return;
         }
         log.info("收到ws消息{}", text);
